@@ -8,9 +8,9 @@ import { getFirestore }  from "https://www.gstatic.com/firebasejs/12.12.0/fireba
 
 const firebaseConfig = {
   apiKey:            "AIzaSyDxJr5-Sbc3tsN-iL9hbrvp5ThIkwN5iro",
-  authDomain:        "OnePiececanal-f8dd1.firebaseapp.com",
-  projectId:         "OnePiececanal-f8dd1",
-  storageBucket:     "OnePiececanal-f8dd1.firebasestorage.app",
+  authDomain:        "onepiececanal-f8dd1.firebaseapp.com",
+  projectId:         "onepiececanal-f8dd1",
+  storageBucket:     "onepiececanal-f8dd1.firebasestorage.app",
   messagingSenderId: "178733003276",
   appId:             "1:178733003276:web:38f87dec2e6688cf297429",
   measurementId:     "G-WG3DNDK62S"
