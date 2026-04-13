@@ -44,64 +44,95 @@
     .kanban-board {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 20px;
       align-items: start;
     }
 
     .kanban-col {
-      background: rgba(255,255,255,.03);
+      background: rgba(255,255,255,.025);
       border: 1px solid var(--line);
       border-radius: 20px;
       overflow: hidden;
       min-height: 300px;
     }
 
+    .col-sin_empezar { border-top: 3px solid rgba(170,179,209,.4); }
+    .col-en_progreso { border-top: 3px solid rgba(255,209,102,.6); }
+    .col-listo       { border-top: 3px solid rgba(89,214,165,.6);  }
+
     .kanban-col-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 14px 16px;
+      padding: 16px 18px 14px;
       border-bottom: 1px solid var(--line);
       position: sticky;
       top: calc(var(--nav-h));
-      background: rgba(14,20,44,.96);
+      background: rgba(14,20,44,.97);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       z-index: 10;
     }
-    .kanban-col-head h3 { margin: 0; font-size: .95rem; letter-spacing: -.01em; }
+    .kanban-col-head h3 {
+      margin: 0;
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
 
-    .col-sin_empezar .kanban-col-head { border-top: 3px solid rgba(170,179,209,.4); }
-    .col-en_progreso .kanban-col-head { border-top: 3px solid rgba(255,209,102,.6); }
-    .col-listo       .kanban-col-head { border-top: 3px solid rgba(89,214,165,.6);  }
+    .col-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 700;
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .col-sin_empezar .col-count { }
+    .col-en_progreso .col-count { background: rgba(255,209,102,.12); color: var(--yellow); border-color: rgba(255,209,102,.3); }
+    .col-listo       .col-count { background: rgba(89,214,165,.12);  color: var(--green);  border-color: rgba(89,214,165,.3);  }
 
     .kanban-cards {
-      display: grid;
-      gap: 10px;
-      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
     }
 
     .kanban-empty {
-      padding: 24px 14px;
+      padding: 32px 16px;
       color: var(--muted);
-      font-size: .85rem;
+      font-size: .83rem;
       text-align: center;
-      border: 1px dashed rgba(255,255,255,.1);
-      border-radius: 12px;
-      margin: 14px;
+      border: 1px dashed rgba(255,255,255,.08);
+      border-radius: 14px;
+      line-height: 1.5;
     }
 
     /* ── Kanban card ──────────────────────────────────────── */
     .kanban-card {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
-      transition: transform .15s, box-shadow .2s;
+      transition: transform .15s, box-shadow .2s, border-color .15s;
     }
-    .kanban-card:hover { transform: translateY(-1px); box-shadow: 0 20px 48px rgba(0,0,0,.35); }
+    .kanban-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.4);
+      border-color: rgba(255,255,255,.1);
+    }
 
-    .kc-body { padding: 14px 14px 10px; display: flex; flex-direction: column; gap: 9px; }
+    .kc-body { padding: 16px 16px 12px; display: flex; flex-direction: column; gap: 10px; }
 
     .kc-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 
@@ -109,7 +140,7 @@
       margin: 0;
       font-size: .95rem;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.4;
       color: var(--text);
     }
 
@@ -118,7 +149,7 @@
     .kc-tesis {
       font-size: .82rem;
       color: var(--muted);
-      line-height: 1.45;
+      line-height: 1.5;
       margin: 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -127,16 +158,16 @@
     }
 
     .kc-footer {
-      padding: 10px 14px;
+      padding: 10px 16px 12px;
       border-top: 1px solid var(--line);
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .kc-estado-select {
-      padding: 6px 28px 6px 9px;
+      padding: 6px 28px 6px 10px;
       border-radius: 9px;
       font-size: .8rem;
       flex-shrink: 0;
@@ -144,7 +175,7 @@
     }
 
     .btn-open-guion {
-      padding: 6px 11px;
+      padding: 6px 12px;
       border-radius: 9px;
       background: rgba(110,168,255,.1);
       border: 1px solid rgba(110,168,255,.25);
@@ -153,12 +184,12 @@
       font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       cursor: pointer;
       text-decoration: none !important;
-      transition: background .15s;
+      transition: background .15s, border-color .15s;
     }
-    .btn-open-guion:hover { background: rgba(110,168,255,.2); }
+    .btn-open-guion:hover { background: rgba(110,168,255,.2); border-color: rgba(110,168,255,.4); }
 
     .kc-actions { display: flex; gap: 5px; align-items: center; margin-left: auto; }
 
@@ -425,7 +456,7 @@
         <div class="kanban-col col-${col.key}">
           <div class="kanban-col-head">
             <h3>${col.label}</h3>
-            <span class="pill">${cards.length}</span>
+            <span class="col-count">${cards.length}</span>
           </div>
           <div class="kanban-cards">
             ${cards.length
