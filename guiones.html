@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guiones · OnePiece</title>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <style>
+    /* ── Toolbar ──────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-pill {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color .15s, background .15s, border-color .15s;
+    }
+    .filter-pill:hover  { color: var(--text); background: rgba(255,255,255,.06); transform: none; }
+    .filter-pill.active { color: var(--text); background: rgba(110,168,255,.14); border-color: rgba(110,168,255,.4); }
+    .filter-search {
+      margin-left: auto;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: .9rem;
+      width: 220px;
+    }
+
+    /* ── Kanban board ─────────────────────────────────────── */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .kanban-col {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 300px;
+    }
+
+    .kanban-col-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: calc(var(--nav-h));
+      background: rgba(14,20,44,.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 10;
+    }
+    .kanban-col-head h3 { margin: 0; font-size: .95rem; letter-spacing: -.01em; }
+
+    .col-sin_empezar .kanban-col-head { border-top: 3px solid rgba(170,179,209,.4); }
+    .col-en_progreso .kanban-col-head { border-top: 3px solid rgba(255,209,102,.6); }
+    .col-listo       .kanban-col-head { border-top: 3px solid rgba(89,214,165,.6);  }
+
+    .kanban-cards {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .kanban-empty {
+      padding: 24px 14px;
+      color: var(--muted);
+      font-size: .85rem;
+      text-align: center;
+      border: 1px dashed rgba(255,255,255,.1);
+      border-radius: 12px;
+      margin: 14px;
+    }
+
+    /* ── Kanban card ──────────────────────────────────────── */
+    .kanban-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform .15s, box-shadow .2s;
+    }
+    .kanban-card:hover { transform: translateY(-1px); box-shadow: 0 20px 48px rgba(0,0,0,.35); }
+
+    .kc-body { padding: 14px 14px 10px; display: flex; flex-direction: column; gap: 9px; }
+
+    .kc-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+    .kc-title {
+      margin: 0;
+      font-size: .95rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    .kc-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+
+    .kc-tesis {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .kc-footer {
+      padding: 10px 14px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .kc-estado-select {
+      padding: 6px 28px 6px 9px;
+      border-radius: 9px;
+      font-size: .8rem;
+      flex-shrink: 0;
+      width: auto;
+    }
+
+    .btn-open-guion {
+      padding: 6px 11px;
+      border-radius: 9px;
+      background: rgba(110,168,255,.1);
+      border: 1px solid rgba(110,168,255,.25);
+      color: var(--accent);
+      font-size: .8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      text-decoration: none !important;
+      transition: background .15s;
+    }
+    .btn-open-guion:hover { background: rgba(110,168,255,.2); }
+
+    .kc-actions { display: flex; gap: 5px; align-items: center; margin-left: auto; }
+
+    /* Inline delete */
+    .delete-confirm { display: inline-flex; gap: 5px; align-items: center; }
+
+    /* Badges */
+    .badge.alta  { color: var(--red);    background: rgba(255,138,138,.1);  border-color: rgba(255,138,138,.3); }
+    .badge.media { color: var(--yellow); background: rgba(255,209,102,.1);  border-color: rgba(255,209,102,.3); }
+    .badge.baja  { color: var(--muted);  background: rgba(255,255,255,.06); border-color: var(--line); }
+
+    .guion-sin_empezar { color: var(--muted);  background: rgba(255,255,255,.06); border-color: var(--line); }
+    .guion-en_progreso { color: var(--yellow); background: rgba(255,209,102,.1);  border-color: rgba(255,209,102,.3); }
+    .guion-listo       { color: var(--green);  background: rgba(89,214,165,.1);   border-color: rgba(89,214,165,.3); }
+
+    /* Modal */
+    .modal-section-title {
+      font-size: .76rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 0 0 14px;
+    }
+    .modal { width: min(620px, 100%); }
+
+    /* Markdown indicator */
+    .kc-md-indicator {
+      font-size: .75rem;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .kc-md-indicator.empty { color: var(--muted); }
+
+    @media (max-width: 900px) {
+      .kanban-board { grid-template-columns: 1fr; }
+      .kanban-col-head { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+
+    <!-- ── Header ─────────────────────────────────────────── -->
+    <div class="page-header">
+      <div class="page-header-text">
+        <h1>Guiones</h1>
+        <p>Tablero kanban para gestionar el estado de escritura de cada guion.</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn-primary" id="btnNuevoGuion">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo guion
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Toolbar ─────────────────────────────────────────── -->
+    <div class="toolbar">
+      <div class="filter-pills" id="tipoPills">
+        <button class="filter-pill active" data-tipo="">Todos</button>
+        <button class="filter-pill" data-tipo="arco">Arco</button>
+        <button class="filter-pill" data-tipo="personaje">Personaje</button>
+        <button class="filter-pill" data-tipo="tema">Tema</button>
+        <button class="filter-pill" data-tipo="conexion">Conexión</button>
+      </div>
+      <input type="search" class="filter-search" id="searchInput" placeholder="Buscar guiones…">
+    </div>
+
+    <!-- ── Kanban ──────────────────────────────────────────── -->
+    <div id="kanbanRoot">
+      <div class="loading"><div class="spinner"></div> Cargando guiones…</div>
+    </div>
+
+  </div><!-- .shell -->
+
+  <!-- ══════════════════════════════════════════════════════
+       Modal crear / editar
+  ══════════════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Nuevo guion</h2>
+        <button class="btn-icon" id="btnCloseModal" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="guionForm">
+
+        <!-- Básico -->
+        <p class="modal-section-title">Básico</p>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="fTitulo">Título *</label>
+          <input id="fTitulo" required placeholder="Título del vídeo">
+        </div>
+        <div class="row-3" style="margin-bottom:12px;">
+          <div class="field">
+            <label for="fTipo">Tipo de vídeo</label>
+            <select id="fTipo">
+              <option value="">— Sin tipo —</option>
+              <option value="arco">Arco</option>
+              <option value="personaje">Personaje</option>
+              <option value="tema">Tema</option>
+              <option value="conexion">Conexión</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fSaga">Saga</label>
+            <select id="fSaga"></select>
+          </div>
+          <div class="field">
+            <label for="fArco">Arco</label>
+            <select id="fArco"></select>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="fPrioridad">Prioridad</label>
+            <select id="fPrioridad">
+              <option value="Alta">Alta</option>
+              <option value="Media" selected>Media</option>
+              <option value="Baja">Baja</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fGuionEstado">Estado del guion</label>
+            <select id="fGuionEstado">
+              <option value="sin_empezar">Sin empezar</option>
+              <option value="en_progreso">En progreso</option>
+              <option value="listo">Listo</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Contenido -->
+        <p class="modal-section-title">Contenido</p>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="fTesis">Tesis central</label>
+          <input id="fTesis" placeholder="La idea fuerte del vídeo en una sola frase">
+        </div>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="fConexion">Conexión con el futuro</label>
+          <input id="fConexion" placeholder="¿Qué conecta este vídeo con otros futuros?">
+        </div>
+        <div class="field">
+          <label for="fGuionNotas">Notas del guion</label>
+          <textarea id="fGuionNotas" style="min-height:80px;" placeholder="Puntos clave, referencias, estructura inicial…"></textarea>
+        </div>
+
+        <div class="actions" style="margin-top:6px;">
+          <button type="submit" class="btn-primary" id="btnSave">Guardar</button>
+          <button type="button" class="btn-secondary" id="btnCancel">Cancelar</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Script
+  ══════════════════════════════════════════════════════ -->
+  <script type="module">
+    import { renderNav } from "./assets/js/utils/nav.js";
+    import { escapeHtml, formatTimestamp, toast, truncate } from "./assets/js/utils/helpers.js";
+    import { TIPO_LABELS, GUION_LABELS, populateSagaSelect } from "./assets/js/config/sagas.js";
+    import {
+      getAllVideos, createVideo, updateVideo, deleteVideo,
+      filterByStage, guionBadgeClass
+    } from "./assets/js/services/videos.js";
+
+    renderNav();
+
+    // ── Estado ────────────────────────────────────────────
+    let allGuiones = [];
+    let filtered   = [];
+    let editingId  = null;
+    const filters  = { tipo: "", search: "" };
+
+    const COLUMNS = [
+      { key: "sin_empezar", label: "Sin empezar" },
+      { key: "en_progreso", label: "En progreso" },
+      { key: "listo",       label: "Listo"        }
+    ];
+
+    // ── DOM ───────────────────────────────────────────────
+    const root         = document.getElementById("kanbanRoot");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalTitle   = document.getElementById("modalTitle");
+    const guionForm    = document.getElementById("guionForm");
+    const fTitulo      = document.getElementById("fTitulo");
+    const fTipo        = document.getElementById("fTipo");
+    const fSaga        = document.getElementById("fSaga");
+    const fArco        = document.getElementById("fArco");
+    const fPrioridad   = document.getElementById("fPrioridad");
+    const fGuionEstado = document.getElementById("fGuionEstado");
+    const fTesis       = document.getElementById("fTesis");
+    const fConexion    = document.getElementById("fConexion");
+    const fGuionNotas  = document.getElementById("fGuionNotas");
+
+    populateSagaSelect(fSaga, fArco);
+
+    // ── Carga ─────────────────────────────────────────────
+    async function load() {
+      try {
+        const all  = await getAllVideos();
+        allGuiones = filterByStage(all, "guion");
+        applyFilters();
+      } catch (err) {
+        console.error(err);
+        root.innerHTML = `<div class="empty-state"><strong>Error al cargar los datos.</strong></div>`;
+        toast("Error al cargar guiones.", "danger");
+      }
+    }
+
+    // ── Filtros ───────────────────────────────────────────
+    function applyFilters() {
+      const search = filters.search.toLowerCase().trim();
+      filtered = allGuiones.filter(v => {
+        const matchTipo   = !filters.tipo || v.tipoVideo === filters.tipo;
+        const matchSearch = !search ||
+          v.titulo.toLowerCase().includes(search) ||
+          v.tesisCentral.toLowerCase().includes(search) ||
+          (v.saga + " " + v.arco).toLowerCase().includes(search);
+        return matchTipo && matchSearch;
+      });
+      render();
+    }
+
+    document.getElementById("tipoPills").addEventListener("click", e => {
+      const pill = e.target.closest(".filter-pill");
+      if (!pill) return;
+      document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      filters.tipo = pill.dataset.tipo;
+      applyFilters();
+    });
+
+    document.getElementById("searchInput").addEventListener("input", e => {
+      filters.search = e.target.value;
+      applyFilters();
+    });
+
+    // ── Render ────────────────────────────────────────────
+    function render() {
+      const totalLabel = `${allGuiones.length} guion${allGuiones.length !== 1 ? "es" : ""} en total`;
+
+      root.innerHTML = `
+        <div style="margin-bottom:16px;color:var(--muted);font-size:.85rem;">${totalLabel}</div>
+        <div class="kanban-board">
+          ${COLUMNS.map(col => columnHTML(col, filtered.filter(v => v.guionEstado === col.key))).join("")}
+        </div>`;
+
+      bindActions();
+    }
+
+    function columnHTML(col, cards) {
+      return `
+        <div class="kanban-col col-${col.key}">
+          <div class="kanban-col-head">
+            <h3>${col.label}</h3>
+            <span class="pill">${cards.length}</span>
+          </div>
+          <div class="kanban-cards">
+            ${cards.length
+              ? cards.map(cardHTML).join("")
+              : `<div class="kanban-empty">Sin guiones aquí todavía.</div>`}
+          </div>
+        </div>`;
+    }
+
+    function prioridadClass(p) {
+      return { Alta: "alta", Media: "media", Baja: "baja" }[p] ?? "media";
+    }
+
+    function estadoOptions(current) {
+      return COLUMNS.map(c =>
+        `<option value="${c.key}"${c.key === current ? " selected" : ""}>${c.label}</option>`
+      ).join("");
+    }
+
+    function cardHTML(v) {
+      const tipoLabel = TIPO_LABELS[v.tipoVideo] ?? "";
+      const hasMarkdown = v.guionMarkdown && v.guionMarkdown.trim().length > 0;
+      const pClass = prioridadClass(v.prioridad);
+
+      return `
+        <article class="kanban-card" data-id="${v.id}">
+          <div class="kc-body">
+
+            <div class="kc-meta">
+              ${v.prioridad  ? `<span class="badge ${pClass}">${escapeHtml(v.prioridad)}</span>` : ""}
+              ${tipoLabel    ? `<span class="badge muted">${escapeHtml(tipoLabel)}</span>` : ""}
+              <span class="kc-md-indicator ${hasMarkdown ? "" : "empty"}" title="${hasMarkdown ? "Tiene contenido" : "Sin contenido aún"}">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                ${hasMarkdown ? "Con contenido" : "Vacío"}
+              </span>
+            </div>
+
+            <h3 class="kc-title">${escapeHtml(v.titulo || "Sin título")}</h3>
+
+            ${v.saga || v.arco ? `
+              <div class="kc-tags">
+                ${v.saga ? `<span class="tag">${escapeHtml(v.saga)}</span>` : ""}
+                ${v.arco ? `<span class="tag">${escapeHtml(v.arco)}</span>`  : ""}
+              </div>` : ""}
+
+            ${v.tesisCentral ? `
+              <p class="kc-tesis">${escapeHtml(truncate(v.tesisCentral, 100))}</p>
+            ` : ""}
+
+          </div>
+
+          <div class="kc-footer">
+            <select class="kc-estado-select js-col-select" data-id="${v.id}">
+              ${estadoOptions(v.guionEstado)}
+            </select>
+
+            <a href="guion.html?id=${v.id}" class="btn-open-guion">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+              </svg>
+              Abrir guion
+            </a>
+
+            <div class="kc-actions">
+              <button class="btn-icon js-edit" data-id="${v.id}" title="Editar metadatos">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button class="btn-icon js-delete-init" data-id="${v.id}" title="Eliminar" style="color:var(--red);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+                  <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                </svg>
+              </button>
+              <span class="delete-confirm hidden" data-id="${v.id}">
+                <button class="btn-sm btn-danger js-delete-confirm" data-id="${v.id}">Borrar</button>
+                <button class="btn-sm btn-secondary js-delete-cancel">×</button>
+              </span>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    // ── Bind acciones ─────────────────────────────────────
+    function bindActions() {
+      // Cambiar columna (guionEstado)
+      root.querySelectorAll(".js-col-select").forEach(sel => {
+        sel.addEventListener("change", async () => {
+          sel.disabled = true;
+          try {
+            await updateVideo(sel.dataset.id, { guionEstado: sel.value });
+            toast('<span class="ok">Estado actualizado.</span>', "ok");
+            await load();
+          } catch (err) {
+            console.error(err);
+            toast("Error al actualizar.", "danger");
+            sel.disabled = false;
+          }
+        });
+      });
+
+      // Editar metadatos
+      root.querySelectorAll(".js-edit").forEach(btn => {
+        btn.addEventListener("click", () => openModal(btn.dataset.id));
+      });
+
+      // Delete — primer clic
+      root.querySelectorAll(".js-delete-init").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          btn.classList.add("hidden");
+          const confirmEl = root.querySelector(`.delete-confirm[data-id="${id}"]`);
+          confirmEl.classList.remove("hidden");
+          setTimeout(() => {
+            if (!confirmEl.classList.contains("hidden")) {
+              confirmEl.classList.add("hidden");
+              btn.classList.remove("hidden");
+            }
+          }, 4000);
+        });
+      });
+
+      // Delete — cancelar
+      root.querySelectorAll(".js-delete-cancel").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const confirmEl = btn.closest(".delete-confirm");
+          confirmEl.classList.add("hidden");
+          root.querySelector(`.js-delete-init[data-id="${confirmEl.dataset.id}"]`).classList.remove("hidden");
+        });
+      });
+
+      // Delete — confirmar
+      root.querySelectorAll(".js-delete-confirm").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          try {
+            await deleteVideo(btn.dataset.id);
+            toast("Guion eliminado.", "ok");
+            await load();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar.", "danger");
+            btn.disabled = false;
+          }
+        });
+      });
+    }
+
+    // ── Modal ─────────────────────────────────────────────
+    function openModal(id = null) {
+      editingId = id;
+
+      if (id) {
+        const v = allGuiones.find(x => x.id === id);
+        if (!v) return;
+        modalTitle.textContent  = "Editar metadatos del guion";
+        fTitulo.value           = v.titulo;
+        fTipo.value             = v.tipoVideo;
+        populateSagaSelect(fSaga, fArco, v.saga, v.arco);
+        fPrioridad.value        = v.prioridad;
+        fGuionEstado.value      = v.guionEstado;
+        fTesis.value            = v.tesisCentral;
+        fConexion.value         = v.conexionFuturo;
+        fGuionNotas.value       = v.guionNotas;
+      } else {
+        modalTitle.textContent = "Nuevo guion";
+        guionForm.reset();
+        fPrioridad.value   = "Media";
+        fGuionEstado.value = "sin_empezar";
+        populateSagaSelect(fSaga, fArco);
+      }
+
+      modalOverlay.classList.remove("hidden");
+      fTitulo.focus();
+    }
+
+    function closeModal() {
+      modalOverlay.classList.add("hidden");
+      editingId = null;
+    }
+
+    document.getElementById("btnNuevoGuion").addEventListener("click",  () => openModal());
+    document.getElementById("btnCloseModal").addEventListener("click",  closeModal);
+    document.getElementById("btnCancel").addEventListener("click",      closeModal);
+    modalOverlay.addEventListener("click", e => { if (e.target === modalOverlay) closeModal(); });
+
+    // ── Guardar ───────────────────────────────────────────
+    guionForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      const saveBtn = document.getElementById("btnSave");
+      saveBtn.disabled    = true;
+      saveBtn.textContent = "Guardando…";
+
+      const data = {
+        titulo:         fTitulo.value.trim(),
+        tipoVideo:      fTipo.value,
+        saga:           fSaga.value,
+        arco:           fArco.value,
+        prioridad:      fPrioridad.value,
+        guionEstado:    fGuionEstado.value,
+        tesisCentral:   fTesis.value.trim(),
+        conexionFuturo: fConexion.value.trim(),
+        guionNotas:     fGuionNotas.value.trim(),
+        estadoPipeline: "guion"
+      };
+
+      try {
+        if (editingId) {
+          await updateVideo(editingId, data);
+          toast('<span class="ok">Guion actualizado.</span>', "ok");
+        } else {
+          await createVideo(data);
+          toast('<span class="ok">Guion creado.</span>', "ok");
+        }
+        closeModal();
+        await load();
+      } catch (err) {
+        console.error(err);
+        toast("No se pudo guardar. Revisa Firestore.", "danger");
+      } finally {
+        saveBtn.disabled    = false;
+        saveBtn.textContent = "Guardar";
+      }
+    });
+
+    // ── Arranque ──────────────────────────────────────────
+    load();
+  </script>
+</body>
+</html>

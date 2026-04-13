@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guion · OnePiece</title>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <style>
+    /* ── Header del guion ─────────────────────────────────── */
+    .guion-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .guion-header-text { flex: 1; min-width: 0; }
+    .guion-titulo {
+      margin: 0 0 10px;
+      font-size: clamp(1.4rem, 3.5vw, 2rem);
+      letter-spacing: -.03em;
+      line-height: 1.2;
+    }
+    .guion-meta-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .guion-header-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Tesis bar ────────────────────────────────────────── */
+    .tesis-bar {
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(155,123,255,.08);
+      border: 1px solid rgba(155,123,255,.2);
+      margin-bottom: 20px;
+      font-size: .9rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .tesis-bar strong { color: var(--accent-2); }
+
+    /* ── Conexion bar ─────────────────────────────────────── */
+    .conexion-bar {
+      font-size: .85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 20px;
+      padding-left: 4px;
+    }
+
+    /* ── Toolbar editor/preview ───────────────────────────── */
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .tab-group { display: flex; background: rgba(255,255,255,.05); border-radius: 12px; border: 1px solid var(--line); overflow: hidden; }
+    .tab-btn {
+      padding: 9px 18px;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      transition: color .15s, background .15s;
+    }
+    .tab-btn:hover { color: var(--text); transform: none; }
+    .tab-btn.active { color: var(--text); background: rgba(110,168,255,.18); }
+    .tab-divider { width: 1px; background: var(--line); }
+
+    .editor-toolbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    .btn-plantilla {
+      padding: 9px 14px;
+      border-radius: 11px;
+      background: rgba(255,209,102,.08);
+      border: 1px solid rgba(255,209,102,.25);
+      color: var(--yellow);
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .15s;
+    }
+    .btn-plantilla:hover { background: rgba(255,209,102,.16); transform: none; }
+
+    .version-label {
+      font-size: .78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Editor ───────────────────────────────────────────── */
+    .guion-editor {
+      width: 100%;
+      min-height: 65vh;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+      font-size: .92rem;
+      line-height: 1.8;
+      resize: vertical;
+      background: rgba(8,13,25,.7);
+      color: var(--text);
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      tab-size: 2;
+    }
+    .guion-editor:focus {
+      border-color: rgba(110,168,255,.5);
+      box-shadow: 0 0 0 3px rgba(110,168,255,.1);
+    }
+
+    /* ── Preview ──────────────────────────────────────────── */
+    .guion-preview {
+      min-height: 65vh;
+      padding: 28px 32px;
+      background: rgba(8,13,25,.5);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      font-size: .95rem;
+      line-height: 1.8;
+      color: var(--text);
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .guion-preview h1 {
+      font-size: 1.5rem;
+      margin: 1.6em 0 .5em;
+      padding-bottom: .4em;
+      border-bottom: 1px solid var(--line);
+      letter-spacing: -.02em;
+    }
+    .guion-preview h1:first-child { margin-top: 0; }
+    .guion-preview h2 {
+      font-size: 1.1rem;
+      margin: 1.4em 0 .4em;
+      color: var(--accent);
+      letter-spacing: -.01em;
+    }
+    .guion-preview h3 {
+      font-size: .98rem;
+      margin: 1.2em 0 .3em;
+      color: var(--accent-2);
+    }
+    .guion-preview p  { margin: 0 0 1em; }
+    .guion-preview p:last-child { margin-bottom: 0; }
+    .guion-preview strong { color: var(--text); font-weight: 700; }
+    .guion-preview em { color: #c8d0f0; font-style: italic; }
+    .guion-preview ul, .guion-preview ol { margin: 0 0 1em; padding-left: 1.6em; }
+    .guion-preview li { margin-bottom: .35em; }
+    .guion-preview blockquote {
+      border-left: 3px solid var(--accent);
+      margin: 1.2em 0;
+      padding: .6em 1.2em;
+      color: var(--muted);
+      background: rgba(110,168,255,.05);
+      border-radius: 0 10px 10px 0;
+    }
+    .guion-preview hr {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 2em 0;
+    }
+    .guion-preview code {
+      background: rgba(255,255,255,.08);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: .88em;
+    }
+    .guion-preview pre {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      margin-bottom: 1em;
+    }
+    .guion-preview pre code { background: none; padding: 0; font-size: .88rem; }
+
+    .preview-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 40vh;
+      color: var(--muted);
+      gap: 12px;
+      font-size: .9rem;
+    }
+
+    /* ── Prompt section ───────────────────────────────────── */
+    .prompt-section { margin-top: 28px; }
+    .prompt-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+    .prompt-toggle:hover { color: var(--text); }
+    .prompt-toggle svg { transition: transform .2s; }
+    .prompt-toggle.open svg { transform: rotate(90deg); }
+    .prompt-body {
+      padding: 20px;
+      margin-top: 2px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      font-size: .83rem;
+      line-height: 1.7;
+      color: var(--muted);
+      white-space: pre-wrap;
+      font-family: inherit;
+    }
+    .prompt-body strong { color: var(--accent); font-family: inherit; }
+
+    /* Estado select */
+    .estado-select-inline {
+      padding: 6px 28px 6px 10px;
+      border-radius: 9px;
+      font-size: .84rem;
+      width: auto;
+    }
+    .guion-sin_empezar { color: var(--muted);  }
+    .guion-en_progreso { color: var(--yellow); }
+    .guion-listo       { color: var(--green);  }
+
+    .btn-calendario {
+      padding: 9px 14px;
+      border-radius: 11px;
+      background: rgba(89,214,165,.08);
+      border: 1px solid rgba(89,214,165,.2);
+      color: var(--green);
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .15s;
+    }
+    .btn-calendario:hover { background: rgba(89,214,165,.16); transform: none; }
+
+    @media (max-width: 700px) {
+      .guion-preview { padding: 18px; }
+      .guion-editor  { padding: 16px; }
+      .guion-header  { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell" id="mainShell">
+    <div class="loading"><div class="spinner"></div> Cargando guion…</div>
+  </div>
+
+  <script type="module">
+    import { renderNav } from "./assets/js/utils/nav.js";
+    import { getParam, escapeHtml, formatTimestamp, toast } from "./assets/js/utils/helpers.js";
+    import { TIPO_LABELS, GUION_LABELS } from "./assets/js/config/sagas.js";
+    import { getTemplate, buildPrompt } from "./assets/js/config/plantillas.js";
+    import {
+      getVideo, updateVideo, saveGuionMarkdown, moveToStage
+    } from "./assets/js/services/videos.js";
+
+    // marked.js via CDN para renderizar markdown
+    import { marked } from "https://cdn.jsdelivr.net/npm/marked@9/lib/marked.esm.js";
+    marked.use({ breaks: true, gfm: true });
+
+    renderNav();
+
+    // ── Estado de la página ───────────────────────────────
+    const videoId = getParam("id");
+    let video     = null;
+    let mode      = "editor"; // "editor" | "preview"
+    let isDirty   = false;
+
+    const shell = document.getElementById("mainShell");
+
+    // ── Carga ─────────────────────────────────────────────
+    async function load() {
+      if (!videoId) {
+        shell.innerHTML = `
+          <div class="empty-state" style="padding:60px 20px;">
+            <strong>No se especificó un vídeo.</strong>
+            <a href="guiones.html" style="color:var(--accent);margin-top:12px;display:inline-block;">← Ir a Guiones</a>
+          </div>`;
+        return;
+      }
+
+      try {
+        video = await getVideo(videoId);
+        if (!video) {
+          shell.innerHTML = `
+            <div class="empty-state" style="padding:60px 20px;">
+              <strong>Vídeo no encontrado.</strong>
+              <a href="guiones.html" style="color:var(--accent);margin-top:12px;display:inline-block;">← Ir a Guiones</a>
+            </div>`;
+          return;
+        }
+
+        // Comportamiento clave del spec:
+        // sin markdown → modo editor; con markdown → modo preview
+        mode = (!video.guionMarkdown || !video.guionMarkdown.trim()) ? "editor" : "preview";
+
+        document.title = `${video.titulo || "Guion"} · OnePiece`;
+        render();
+      } catch (err) {
+        console.error(err);
+        shell.innerHTML = `<div class="empty-state"><strong>Error al cargar el guion.</strong></div>`;
+        toast("Error al cargar el guion.", "danger");
+      }
+    }
+
+    // ── Render completo de la página ──────────────────────
+    function render() {
+      const tipoLabel   = TIPO_LABELS[video.tipoVideo] ?? "";
+      const estadoLabel = GUION_LABELS[video.guionEstado] ?? video.guionEstado;
+      const fecha       = formatTimestamp(video.guionUltimaEdicion || video.updatedAt);
+      const hasMarkdown = video.guionMarkdown && video.guionMarkdown.trim();
+
+      shell.innerHTML = `
+
+        <!-- ── Cabecera ────────────────────────────────────── -->
+        <div class="guion-header">
+          <div class="guion-header-text">
+            <div style="margin-bottom:10px;">
+              <a href="guiones.html" class="btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                Guiones
+              </a>
+            </div>
+            <h1 class="guion-titulo">${escapeHtml(video.titulo || "Sin título")}</h1>
+            <div class="guion-meta-row">
+              <select class="estado-select-inline js-estado-select">
+                <option value="sin_empezar"${video.guionEstado === "sin_empezar" ? " selected" : ""}>Sin empezar</option>
+                <option value="en_progreso"${video.guionEstado === "en_progreso" ? " selected" : ""}>En progreso</option>
+                <option value="listo"${video.guionEstado === "listo" ? " selected" : ""}>Listo</option>
+              </select>
+              ${tipoLabel ? `<span class="badge muted">${escapeHtml(tipoLabel)}</span>` : ""}
+              ${video.saga ? `<span class="tag">${escapeHtml(video.saga)}</span>` : ""}
+              ${video.arco ? `<span class="tag">${escapeHtml(video.arco)}</span>`  : ""}
+              ${video.prioridad ? `<span class="tag">${escapeHtml(video.prioridad)}</span>` : ""}
+            </div>
+          </div>
+          <div class="guion-header-actions">
+            <button class="btn-calendario js-btn-calendario" title="Mover a Calendario">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              → Calendario
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Tesis ───────────────────────────────────────── -->
+        ${video.tesisCentral ? `
+          <div class="tesis-bar">
+            <strong>Tesis:</strong> ${escapeHtml(video.tesisCentral)}
+          </div>` : ""}
+        ${video.conexionFuturo ? `
+          <p class="conexion-bar">Conexión: ${escapeHtml(video.conexionFuturo)}</p>
+        ` : ""}
+
+        <!-- ── Toolbar editor/preview ──────────────────────── -->
+        <div class="editor-toolbar">
+          <div class="tab-group">
+            <button class="tab-btn${mode === "editor"  ? " active" : ""}" id="tabEditor"  type="button">Editar</button>
+            <div class="tab-divider"></div>
+            <button class="tab-btn${mode === "preview" ? " active" : ""}" id="tabPreview" type="button">Preview</button>
+          </div>
+          <div class="editor-toolbar-right">
+            ${fecha !== "—" ? `<span class="version-label">v${video.guionVersion} · ${fecha}</span>` : ""}
+            <button class="btn-plantilla js-btn-plantilla" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
+                <line x1="9" y1="21" x2="9" y2="9"/>
+              </svg>
+              Generar plantilla
+            </button>
+            <button class="btn-primary btn-sm js-btn-save" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Guardar
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Área de contenido ───────────────────────────── -->
+        <div id="contentArea">
+          ${renderContentArea()}
+        </div>
+
+        <!-- ── Prompt base ─────────────────────────────────── -->
+        <div class="prompt-section">
+          <div class="prompt-toggle" id="promptToggle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            Prompt base del canal (adaptado a este vídeo)
+            <button class="btn-secondary btn-sm" id="btnCopyPrompt" style="margin-left:auto;font-size:.78rem;padding:5px 10px;" type="button">Copiar</button>
+          </div>
+          <pre class="prompt-body hidden" id="promptBody">${escapeHtml(buildPrompt(video))}</pre>
+        </div>
+      `;
+
+      // Bind tras render
+      bindActions();
+    }
+
+    function renderContentArea() {
+      if (mode === "editor") {
+        return `<textarea class="guion-editor" id="guionEditor" placeholder="Escribe tu guion en markdown…\n\nPulsa 'Generar plantilla' para empezar con una estructura base.">${escapeHtml(video.guionMarkdown || "")}</textarea>`;
+      }
+
+      if (!video.guionMarkdown || !video.guionMarkdown.trim()) {
+        return `<div class="guion-preview"><div class="preview-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>El guion está vacío.</span>
+          <button class="btn-primary btn-sm" onclick="document.getElementById('tabEditor').click()">Empezar a escribir</button>
+        </div></div>`;
+      }
+
+      return `<div class="guion-preview" id="guionPreview">${marked.parse(video.guionMarkdown)}</div>`;
+    }
+
+    // ── Bind acciones ─────────────────────────────────────
+    function bindActions() {
+      // Tabs
+      document.getElementById("tabEditor")?.addEventListener("click", () => {
+        if (mode === "editor") return;
+        // Si estábamos en preview, sincronizar el markdown al volver a editor
+        mode = "editor";
+        switchTab();
+      });
+
+      document.getElementById("tabPreview")?.addEventListener("click", () => {
+        if (mode === "preview") return;
+        // Guardar el contenido actual del textarea antes de cambiar
+        const editor = document.getElementById("guionEditor");
+        if (editor) video.guionMarkdown = editor.value;
+        mode = "preview";
+        switchTab();
+      });
+
+      // Guardar
+      document.querySelector(".js-btn-save")?.addEventListener("click", saveGuion);
+
+      // Generar plantilla
+      document.querySelector(".js-btn-plantilla")?.addEventListener("click", insertTemplate);
+
+      // Estado select
+      document.querySelector(".js-estado-select")?.addEventListener("change", async e => {
+        try {
+          await updateVideo(videoId, { guionEstado: e.target.value });
+          video.guionEstado = e.target.value;
+          toast('<span class="ok">Estado actualizado.</span>', "ok");
+        } catch (err) {
+          console.error(err);
+          toast("Error al actualizar el estado.", "danger");
+        }
+      });
+
+      // Mover a Calendario
+      document.querySelector(".js-btn-calendario")?.addEventListener("click", async () => {
+        const btn = document.querySelector(".js-btn-calendario");
+        btn.disabled = true;
+        try {
+          // Guardar el markdown actual antes de mover
+          const editor = document.getElementById("guionEditor");
+          if (editor && editor.value !== video.guionMarkdown) {
+            await saveGuionMarkdown(videoId, editor.value, video);
+          }
+          await moveToStage(videoId, "calendario");
+          toast('<span class="ok">Movido a Calendario.</span>', "ok");
+          setTimeout(() => { window.location.href = "guiones.html"; }, 800);
+        } catch (err) {
+          console.error(err);
+          toast("Error al mover a Calendario.", "danger");
+          btn.disabled = false;
+        }
+      });
+
+      // Prompt toggle
+      document.getElementById("promptToggle")?.addEventListener("click", e => {
+        if (e.target.closest("#btnCopyPrompt")) return;
+        const toggle = document.getElementById("promptToggle");
+        const body   = document.getElementById("promptBody");
+        const isOpen = !body.classList.contains("hidden");
+        body.classList.toggle("hidden", isOpen);
+        toggle.classList.toggle("open", !isOpen);
+      });
+
+      // Copiar prompt
+      document.getElementById("btnCopyPrompt")?.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(buildPrompt(video));
+          toast('<span class="ok">Prompt copiado al portapapeles.</span>', "ok");
+        } catch {
+          toast("No se pudo copiar. Copia el texto manualmente.", "warn");
+        }
+      });
+
+      // Track cambios en el editor
+      document.getElementById("guionEditor")?.addEventListener("input", () => { isDirty = true; });
+    }
+
+    // ── Cambiar tab ───────────────────────────────────────
+    function switchTab() {
+      const tabE = document.getElementById("tabEditor");
+      const tabP = document.getElementById("tabPreview");
+      tabE?.classList.toggle("active", mode === "editor");
+      tabP?.classList.toggle("active", mode === "preview");
+      const contentArea = document.getElementById("contentArea");
+      if (contentArea) contentArea.innerHTML = renderContentArea();
+
+      // Re-bind el botón de "Empezar a escribir" del preview vacío
+      document.getElementById("guionEditor")?.addEventListener("input", () => { isDirty = true; });
+    }
+
+    // ── Guardar guion ─────────────────────────────────────
+    async function saveGuion() {
+      const editor = document.getElementById("guionEditor");
+      const saveBtn = document.querySelector(".js-btn-save");
+
+      // Si estamos en preview, guardar el markdown actual del video
+      const markdown = mode === "editor"
+        ? (editor ? editor.value : video.guionMarkdown)
+        : video.guionMarkdown;
+
+      saveBtn.disabled    = true;
+      saveBtn.textContent = "Guardando…";
+
+      try {
+        await saveGuionMarkdown(videoId, markdown, video);
+        video.guionMarkdown = markdown;
+        video.guionVersion  = (video.guionVersion || 1) + 1;
+        isDirty = false;
+        toast('<span class="ok">Guion guardado.</span>', "ok");
+        // Actualizar versión en toolbar sin re-render completo
+        const vl = document.querySelector(".version-label");
+        if (vl) vl.textContent = `v${video.guionVersion} · Ahora mismo`;
+      } catch (err) {
+        console.error(err);
+        toast("Error al guardar. Revisa Firestore.", "danger");
+      } finally {
+        saveBtn.disabled    = false;
+        saveBtn.textContent = "Guardar";
+      }
+    }
+
+    // ── Insertar / añadir plantilla ───────────────────────
+    function insertTemplate() {
+      // Si no estamos en modo editor, cambiar antes
+      if (mode !== "editor") {
+        mode = "editor";
+        switchTab();
+      }
+
+      const editor = document.getElementById("guionEditor");
+      if (!editor) return;
+
+      const template = getTemplate(video);
+      const current  = editor.value.trim();
+
+      if (!current) {
+        // Sin contenido → insertar directamente
+        editor.value = template;
+        toast("Plantilla insertada en el editor.", "ok");
+      } else {
+        // Con contenido → añadir al final con separador
+        editor.value = current + "\n\n---\n\n" + template;
+        toast("Plantilla añadida al final del guion.", "ok");
+        // Scroll al final
+        editor.scrollTop = editor.scrollHeight;
+      }
+
+      isDirty = true;
+    }
+
+    // ── Advertir al salir con cambios sin guardar ─────────
+    window.addEventListener("beforeunload", e => {
+      const editor = document.getElementById("guionEditor");
+      if (isDirty || (editor && editor.value !== video?.guionMarkdown)) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+    // ── Arranque ──────────────────────────────────────────
+    load();
+  </script>
+</body>
+</html>

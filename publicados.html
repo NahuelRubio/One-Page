@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicados · OnePiece</title>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/pages/publicados.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="page-header">
+      <div class="page-header-text">
+        <div class="page-eyebrow">Histórico del canal</div>
+        <h1 class="page-title">Publicados</h1>
+        <p>Galería visual de vídeos ya publicados con su URL, miniatura y enlace directo al histórico del calendario.</p>
+      </div>
+    </div>
+
+    <section class="published-stats">
+      <div class="stat"><div class="n" id="statTotal">—</div><div class="l">Vídeos publicados</div></div>
+      <div class="stat"><div class="n" id="statThisYear">—</div><div class="l">Este año</div></div>
+      <div class="stat"><div class="n" id="statWithUrl">—</div><div class="l">Con URL de YouTube</div></div>
+      <div class="stat"><div class="n" id="statWithThumb">—</div><div class="l">Con miniatura resuelta</div></div>
+    </section>
+
+    <section class="published-toolbar">
+      <div class="filter-pills" id="filterPills">
+        <button class="filter-pill active" type="button" data-tipo="">Todos</button>
+        <button class="filter-pill" type="button" data-tipo="arco">Arco</button>
+        <button class="filter-pill" type="button" data-tipo="personaje">Personaje</button>
+        <button class="filter-pill" type="button" data-tipo="tema">Tema</button>
+        <button class="filter-pill" type="button" data-tipo="conexion">Conexión</button>
+      </div>
+      <div class="published-toolbar-spacer"></div>
+      <input id="searchInput" class="published-search" type="search" placeholder="Buscar por título, saga, arco o tesis…">
+      <select id="sortSelect" class="published-sort">
+        <option value="fecha_desc">Fecha más reciente</option>
+        <option value="fecha_asc">Fecha más antigua</option>
+        <option value="titulo_asc">Título A-Z</option>
+        <option value="saga_asc">Saga</option>
+      </select>
+    </section>
+
+    <p class="published-count" id="publishedCount">—</p>
+
+    <section class="published-grid" id="publishedGrid">
+      <div class="card published-empty loading">
+        <div class="spinner"></div>
+        Cargando publicados…
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" style="display:none">
+    <div class="modal" style="width:min(700px, 100%)">
+      <div class="modal-header">
+        <h2 id="modalTitle">Editar publicado</h2>
+        <button class="btn-icon" id="modalClose" type="button" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="modalForm">
+        <input id="fId" type="hidden">
+
+        <div class="field">
+          <label for="fTituloPublicado">Título publicado</label>
+          <input id="fTituloPublicado" type="text" placeholder="Título tal como aparece en YouTube">
+        </div>
+
+        <div class="field">
+          <label for="fYoutubeUrl">URL de YouTube</label>
+          <input id="fYoutubeUrl" type="url" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+
+        <div class="field">
+          <label for="fThumbnailUrl">URL de miniatura</label>
+          <input id="fThumbnailUrl" type="url" placeholder="https://i.ytimg.com/vi/.../hqdefault.jpg">
+          <div class="thumb-preview" id="thumbPreview">
+            <img id="thumbPreviewImg" alt="Vista previa de miniatura">
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="fFechaPublicacionReal">Fecha de publicación real</label>
+            <input id="fFechaPublicacionReal" type="date">
+          </div>
+          <div class="field">
+            <label for="fTipoVideo">Tipo de vídeo</label>
+            <input id="fTipoVideo" class="readonly-field" type="text" readonly>
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="fSaga">Saga</label>
+            <input id="fSaga" class="readonly-field" type="text" readonly>
+          </div>
+          <div class="field">
+            <label for="fArco">Arco</label>
+            <input id="fArco" class="readonly-field" type="text" readonly>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="fTesisCentral">Tesis central</label>
+          <textarea id="fTesisCentral" class="readonly-field" rows="3" readonly></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" id="modalCancel" type="button">Cancelar</button>
+          <button class="btn-primary" id="modalSave" type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="./assets/js/pages/publicados-page.js"></script>
+</body>
+</html>

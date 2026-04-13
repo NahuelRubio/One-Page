@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap · OnePiece </title>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <style>
+    /* ── Filtros ──────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-pill {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color .15s, background .15s, border-color .15s;
+    }
+    .filter-pill:hover  { color: var(--text); background: rgba(255,255,255,.06); transform: none; }
+    .filter-pill.active { color: var(--text); background: rgba(110,168,255,.14); border-color: rgba(110,168,255,.4); }
+
+    .toolbar-right { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+    .filter-search {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: .9rem;
+      width: 220px;
+    }
+    .sort-select {
+      padding: 8px 30px 8px 12px;
+      border-radius: 10px;
+      font-size: .85rem;
+      width: auto;
+    }
+
+    /* ── Roadmap items ────────────────────────────────────── */
+    .rm-list { display: grid; gap: 10px; }
+
+    .rm-item {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .rm-order-col {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px 0 20px;
+      border-right: 1px solid var(--line);
+    }
+    .rm-order-num {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    .rm-main-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .rm-top {
+      padding: 16px 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .rm-headline {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .rm-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex-shrink: 0; }
+
+    .rm-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .rm-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .rm-tesis {
+      font-size: .85rem;
+      color: var(--muted);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .rm-tesis strong { color: var(--accent-2); font-weight: 600; }
+
+    .rm-conexion {
+      font-size: .82rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .rm-bottom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    .rm-estado-select {
+      padding: 7px 30px 7px 10px;
+      border-radius: 10px;
+      font-size: .84rem;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .rm-fechas {
+      font-size: .8rem;
+      color: var(--muted);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .rm-fecha-item { display: flex; gap: 4px; align-items: center; }
+    .rm-fecha-label { font-weight: 600; color: var(--text); opacity: .7; }
+
+    .rm-actions { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+
+    .btn-guion {
+      padding: 7px 12px;
+      border-radius: 9px;
+      background: rgba(255,209,102,.1);
+      border: 1px solid rgba(255,209,102,.25);
+      color: var(--yellow);
+      font-size: .8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-guion:hover { background: rgba(255,209,102,.2); transform: none; }
+
+    /* Delete confirm inline */
+    .delete-confirm { display: inline-flex; gap: 5px; align-items: center; }
+
+    /* Estado colors */
+    .estado-pendiente  { color: var(--muted);   background: rgba(255,255,255,.06); border-color: var(--line); }
+    .estado-priorizado { color: var(--accent);  background: rgba(110,168,255,.12); border-color: rgba(110,168,255,.3); }
+    .estado-guionizar  { color: var(--yellow);  background: rgba(255,209,102,.1);  border-color: rgba(255,209,102,.3); }
+    .estado-aparcado   { color: var(--red);     background: rgba(255,138,138,.1);  border-color: rgba(255,138,138,.3); }
+
+    /* Prioridad */
+    .badge.alta  { color: var(--red);    background: rgba(255,138,138,.1);  border-color: rgba(255,138,138,.3); }
+    .badge.media { color: var(--yellow); background: rgba(255,209,102,.1);  border-color: rgba(255,209,102,.3); }
+    .badge.baja  { color: var(--muted);  background: rgba(255,255,255,.06); border-color: var(--line); }
+
+    /* Modal */
+    .modal-section-title {
+      font-size: .76rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 0 0 14px;
+    }
+    .modal { width: min(720px, 100%); }
+
+    .rm-count { color: var(--muted); font-size: .85rem; margin-top: 14px; }
+
+    @media (max-width: 600px) {
+      .rm-item { grid-template-columns: 1fr; }
+      .rm-order-col { display: none; }
+      .rm-actions { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+
+    <!-- ── Header ──────────────────────────────────────── -->
+    <div class="page-header">
+      <div class="page-header-text">
+        <h1>Roadmap</h1>
+        <p>Lista operativa de vídeos planificados con saga, arco, prioridad y fechas tentativas.</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn-primary" id="btnNuevoRoadmap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Añadir al roadmap
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Toolbar ──────────────────────────────────────── -->
+    <div class="toolbar">
+      <div class="filter-pills" id="estadoPills">
+        <button class="filter-pill active" data-estado="">Todos</button>
+        <button class="filter-pill" data-estado="pendiente">Pendiente</button>
+        <button class="filter-pill" data-estado="priorizado">Priorizado</button>
+        <button class="filter-pill" data-estado="guionizar">Para guionizar</button>
+        <button class="filter-pill" data-estado="aparcado">Aparcado</button>
+      </div>
+      <div class="toolbar-right">
+        <select class="sort-select" id="sortSelect">
+          <option value="orden">Orden</option>
+          <option value="prioridad">Prioridad</option>
+          <option value="fechaGrabacionTentativa">Fecha grabación</option>
+          <option value="createdAt">Fecha creación</option>
+        </select>
+        <input type="search" class="filter-search" id="searchInput" placeholder="Buscar…">
+      </div>
+    </div>
+
+    <!-- ── Lista ────────────────────────────────────────── -->
+    <div id="roadmapRoot">
+      <div class="loading"><div class="spinner"></div> Cargando roadmap…</div>
+    </div>
+    <p class="rm-count hidden" id="rmCount"></p>
+
+  </div><!-- .shell -->
+
+  <!-- ══════════════════════════════════════════════════════
+       Modal crear / editar
+  ══════════════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Añadir al roadmap</h2>
+        <button class="btn-icon" id="btnCloseModal" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="rmForm">
+
+        <!-- Básico -->
+        <p class="modal-section-title">Básico</p>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="fTitulo">Título *</label>
+          <input id="fTitulo" required placeholder="Título del vídeo">
+        </div>
+        <div class="row-3" style="margin-bottom:12px;">
+          <div class="field">
+            <label for="fTipo">Tipo de vídeo</label>
+            <select id="fTipo">
+              <option value="">— Sin tipo —</option>
+              <option value="arco">Arco</option>
+              <option value="personaje">Personaje</option>
+              <option value="tema">Tema</option>
+              <option value="conexion">Conexión</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fSaga">Saga</label>
+            <select id="fSaga"></select>
+          </div>
+          <div class="field">
+            <label for="fArco">Arco</label>
+            <select id="fArco"></select>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="fPrioridad">Prioridad</label>
+            <select id="fPrioridad">
+              <option value="Alta">Alta</option>
+              <option value="Media" selected>Media</option>
+              <option value="Baja">Baja</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fOrden">Orden</label>
+            <input type="number" id="fOrden" min="0" placeholder="0" value="0">
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Roadmap -->
+        <p class="modal-section-title">Planificación</p>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="fEstadoRM">Estado roadmap</label>
+          <select id="fEstadoRM">
+            <option value="pendiente">Pendiente</option>
+            <option value="priorizado">Priorizado</option>
+            <option value="guionizar">Para guionizar</option>
+            <option value="aparcado">Aparcado</option>
+          </select>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="fFechaGrab">Fecha grabación tentativa</label>
+            <input type="date" id="fFechaGrab">
+          </div>
+          <div class="field">
+            <label for="fFechaPub">Fecha publicación tentativa</label>
+            <input type="date" id="fFechaPub">
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Contenido -->
+        <p class="modal-section-title">Contenido</p>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="fTesis">Tesis central</label>
+          <input id="fTesis" placeholder="La idea fuerte del vídeo en una sola frase">
+        </div>
+        <div class="field" style="margin-bottom:12px;">
+          <label for="fConexion">Conexión con el futuro</label>
+          <input id="fConexion" placeholder="¿Qué conecta este vídeo con otros futuros?">
+        </div>
+        <div class="field">
+          <label for="fIdeaTexto">Texto de la idea</label>
+          <textarea id="fIdeaTexto" style="min-height:80px;" placeholder="Idea principal, enfoque, reflexiones…"></textarea>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Notas -->
+        <p class="modal-section-title">Notas de roadmap</p>
+        <div class="field">
+          <label for="fNotas">Notas</label>
+          <textarea id="fNotas" style="min-height:70px;" placeholder="Contexto, referencias, cosas a resolver antes de guionizar…"></textarea>
+        </div>
+
+        <div class="actions" style="margin-top:6px;">
+          <button type="submit" class="btn-primary" id="btnSave">Guardar</button>
+          <button type="button" class="btn-secondary" id="btnCancel">Cancelar</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       Script
+  ══════════════════════════════════════════════════════ -->
+  <script type="module">
+    import { renderNav } from "./assets/js/utils/nav.js";
+    import { escapeHtml, formatDate, formatTimestamp, toast } from "./assets/js/utils/helpers.js";
+    import { TIPO_LABELS, ROADMAP_LABELS, populateSagaSelect } from "./assets/js/config/sagas.js";
+    import {
+      getAllVideos, createVideo, updateVideo, deleteVideo,
+      moveToStage, filterByStage, sortVideos
+    } from "./assets/js/services/videos.js";
+
+    renderNav();
+
+    // ── Estado ────────────────────────────────────────────
+    let allRM    = [];
+    let filtered = [];
+    let editingId = null;
+    const filters = { estado: "", search: "" };
+    let sortField = "orden";
+
+    // ── DOM ───────────────────────────────────────────────
+    const root         = document.getElementById("roadmapRoot");
+    const countEl      = document.getElementById("rmCount");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalTitle   = document.getElementById("modalTitle");
+    const rmForm       = document.getElementById("rmForm");
+    const fTitulo      = document.getElementById("fTitulo");
+    const fTipo        = document.getElementById("fTipo");
+    const fSaga        = document.getElementById("fSaga");
+    const fArco        = document.getElementById("fArco");
+    const fPrioridad   = document.getElementById("fPrioridad");
+    const fOrden       = document.getElementById("fOrden");
+    const fEstadoRM    = document.getElementById("fEstadoRM");
+    const fFechaGrab   = document.getElementById("fFechaGrab");
+    const fFechaPub    = document.getElementById("fFechaPub");
+    const fTesis       = document.getElementById("fTesis");
+    const fConexion    = document.getElementById("fConexion");
+    const fIdeaTexto   = document.getElementById("fIdeaTexto");
+    const fNotas       = document.getElementById("fNotas");
+
+    populateSagaSelect(fSaga, fArco);
+
+    // ── Carga ─────────────────────────────────────────────
+    async function load() {
+      try {
+        const all = await getAllVideos();
+        allRM = filterByStage(all, "roadmap");
+        applyFilters();
+      } catch (err) {
+        console.error(err);
+        root.innerHTML = `<div class="empty-state"><strong>Error al cargar los datos.</strong></div>`;
+        toast("Error al cargar el roadmap.", "danger");
+      }
+    }
+
+    // ── Filtros y orden ───────────────────────────────────
+    function applyFilters() {
+      const search = filters.search.toLowerCase().trim();
+      filtered = allRM.filter(v => {
+        const matchEstado  = !filters.estado || v.roadmapEstado === filters.estado;
+        const matchSearch  = !search ||
+          v.titulo.toLowerCase().includes(search)     ||
+          v.saga.toLowerCase().includes(search)       ||
+          v.arco.toLowerCase().includes(search)       ||
+          v.tesisCentral.toLowerCase().includes(search);
+        return matchEstado && matchSearch;
+      });
+
+      // Ordenar
+      const dir = sortField === "prioridad" ? "asc" : "asc";
+      filtered = sortVideos(filtered, sortField, sortField === "prioridad" ? "asc" : "asc");
+
+      render();
+    }
+
+    document.getElementById("estadoPills").addEventListener("click", e => {
+      const pill = e.target.closest(".filter-pill");
+      if (!pill) return;
+      document.querySelectorAll("#estadoPills .filter-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      filters.estado = pill.dataset.estado;
+      applyFilters();
+    });
+
+    document.getElementById("searchInput").addEventListener("input", e => {
+      filters.search = e.target.value;
+      applyFilters();
+    });
+
+    document.getElementById("sortSelect").addEventListener("change", e => {
+      sortField = e.target.value;
+      applyFilters();
+    });
+
+    // ── Render ────────────────────────────────────────────
+    function render() {
+      if (!filtered.length) {
+        const hasFilters = filters.estado || filters.search;
+        root.innerHTML = `
+          <div class="empty-state">
+            <strong>${hasFilters ? "Sin resultados" : "El roadmap está vacío"}</strong>
+            ${hasFilters
+              ? "Prueba a cambiar los filtros."
+              : "Añade vídeos al roadmap desde Ideas o con el botón de arriba."}
+          </div>`;
+        countEl.classList.add("hidden");
+        return;
+      }
+
+      root.innerHTML = `<div class="rm-list">${filtered.map(itemHTML).join("")}</div>`;
+
+      countEl.textContent = `${filtered.length} vídeo${filtered.length !== 1 ? "s" : ""}${
+        filtered.length !== allRM.length ? ` (de ${allRM.length} en roadmap)` : " en roadmap"}`;
+      countEl.classList.remove("hidden");
+
+      bindActions();
+    }
+
+    function estadoClass(e) {
+      return { pendiente: "estado-pendiente", priorizado: "estado-priorizado",
+               guionizar: "estado-guionizar",  aparcado:   "estado-aparcado" }[e] ?? "";
+    }
+
+    function prioridadClass(p) {
+      return { Alta: "alta", Media: "media", Baja: "baja" }[p] ?? "media";
+    }
+
+    function estadoOptions(current) {
+      return [
+        ["pendiente",  "Pendiente"],
+        ["priorizado", "Priorizado"],
+        ["guionizar",  "Para guionizar"],
+        ["aparcado",   "Aparcado"]
+      ].map(([v, l]) => `<option value="${v}"${v === current ? " selected" : ""}>${l}</option>`).join("");
+    }
+
+    function itemHTML(v) {
+      const tipoLabel = TIPO_LABELS[v.tipoVideo] ?? "";
+      const eClass    = estadoClass(v.roadmapEstado);
+      const pClass    = prioridadClass(v.prioridad);
+
+      return `
+        <article class="card rm-item" data-id="${v.id}">
+
+          <div class="rm-order-col">
+            <span class="rm-order-num">${v.roadmapOrden > 0 ? v.roadmapOrden : "·"}</span>
+          </div>
+
+          <div class="rm-main-col">
+            <div class="rm-top">
+
+              <div class="rm-headline">
+                <div class="rm-badges">
+                  <span class="badge ${eClass}">${escapeHtml(ROADMAP_LABELS[v.roadmapEstado] ?? v.roadmapEstado)}</span>
+                  <span class="badge ${pClass}">${escapeHtml(v.prioridad)}</span>
+                  ${tipoLabel ? `<span class="badge muted">${escapeHtml(tipoLabel)}</span>` : ""}
+                </div>
+                <h3 class="rm-title">${escapeHtml(v.titulo || "Sin título")}</h3>
+              </div>
+
+              ${v.saga || v.arco ? `
+                <div class="rm-tags">
+                  ${v.saga ? `<span class="tag">${escapeHtml(v.saga)}</span>` : ""}
+                  ${v.arco ? `<span class="tag">${escapeHtml(v.arco)}</span>`  : ""}
+                </div>` : ""}
+
+              ${v.tesisCentral ? `
+                <p class="rm-tesis">
+                  <strong>Tesis:</strong> ${escapeHtml(v.tesisCentral)}
+                </p>` : ""}
+
+              ${v.conexionFuturo ? `
+                <p class="rm-conexion">Conexión: ${escapeHtml(v.conexionFuturo)}</p>
+              ` : ""}
+
+            </div>
+
+            <div class="rm-bottom">
+
+              <select class="rm-estado-select ${eClass} js-estado" data-id="${v.id}">
+                ${estadoOptions(v.roadmapEstado)}
+              </select>
+
+              ${v.fechaGrabacionTentativa || v.fechaPublicacionTentativa ? `
+                <div class="rm-fechas">
+                  ${v.fechaGrabacionTentativa ? `
+                    <div class="rm-fecha-item">
+                      <span class="rm-fecha-label">Grab.:</span>
+                      ${escapeHtml(formatDate(v.fechaGrabacionTentativa))}
+                    </div>` : ""}
+                  ${v.fechaPublicacionTentativa ? `
+                    <div class="rm-fecha-item">
+                      <span class="rm-fecha-label">Pub.:</span>
+                      ${escapeHtml(formatDate(v.fechaPublicacionTentativa))}
+                    </div>` : ""}
+                </div>` : ""}
+
+              <div class="rm-actions">
+                <button class="btn-guion js-guion" data-id="${v.id}" title="Mover a Guiones">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  Guion
+                </button>
+                <button class="btn-icon js-edit" data-id="${v.id}" title="Editar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+                <button class="btn-icon js-delete-init" data-id="${v.id}" title="Eliminar" style="color:var(--red);">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+                    <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                  </svg>
+                </button>
+                <span class="delete-confirm hidden" data-id="${v.id}">
+                  <button class="btn-sm btn-danger js-delete-confirm" data-id="${v.id}">Borrar</button>
+                  <button class="btn-sm btn-secondary js-delete-cancel">×</button>
+                </span>
+              </div>
+
+            </div>
+          </div>
+        </article>`;
+    }
+
+    // ── Bind acciones ─────────────────────────────────────
+    function bindActions() {
+      // Cambio de estado inline
+      root.querySelectorAll(".js-estado").forEach(sel => {
+        sel.addEventListener("change", async () => {
+          sel.disabled = true;
+          try {
+            await updateVideo(sel.dataset.id, { roadmapEstado: sel.value });
+            toast('<span class="ok">Estado actualizado.</span>', "ok");
+            await load();
+          } catch (err) {
+            console.error(err);
+            toast("Error al actualizar.", "danger");
+            sel.disabled = false;
+          }
+        });
+      });
+
+      // Editar
+      root.querySelectorAll(".js-edit").forEach(btn => {
+        btn.addEventListener("click", () => openModal(btn.dataset.id));
+      });
+
+      // Mover a Guion
+      root.querySelectorAll(".js-guion").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          try {
+            await moveToStage(btn.dataset.id, "guion");
+            toast('<span class="ok">Movido a Guiones.</span>', "ok");
+            await load();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo mover a Guiones.", "danger");
+            btn.disabled = false;
+          }
+        });
+      });
+
+      // Delete — primer clic
+      root.querySelectorAll(".js-delete-init").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          btn.classList.add("hidden");
+          const confirmEl = root.querySelector(`.delete-confirm[data-id="${id}"]`);
+          confirmEl.classList.remove("hidden");
+          setTimeout(() => {
+            if (!confirmEl.classList.contains("hidden")) {
+              confirmEl.classList.add("hidden");
+              btn.classList.remove("hidden");
+            }
+          }, 4000);
+        });
+      });
+
+      // Delete — cancelar
+      root.querySelectorAll(".js-delete-cancel").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const confirmEl = btn.closest(".delete-confirm");
+          confirmEl.classList.add("hidden");
+          root.querySelector(`.js-delete-init[data-id="${confirmEl.dataset.id}"]`).classList.remove("hidden");
+        });
+      });
+
+      // Delete — confirmar
+      root.querySelectorAll(".js-delete-confirm").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          try {
+            await deleteVideo(btn.dataset.id);
+            toast("Vídeo eliminado.", "ok");
+            await load();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar.", "danger");
+            btn.disabled = false;
+          }
+        });
+      });
+    }
+
+    // ── Modal ─────────────────────────────────────────────
+    function openModal(id = null) {
+      editingId = id;
+
+      if (id) {
+        const v = allRM.find(x => x.id === id);
+        if (!v) return;
+        modalTitle.textContent     = "Editar entrada de roadmap";
+        fTitulo.value              = v.titulo;
+        fTipo.value                = v.tipoVideo;
+        populateSagaSelect(fSaga, fArco, v.saga, v.arco);
+        fPrioridad.value           = v.prioridad;
+        fOrden.value               = v.roadmapOrden;
+        fEstadoRM.value            = v.roadmapEstado;
+        fFechaGrab.value           = v.fechaGrabacionTentativa;
+        fFechaPub.value            = v.fechaPublicacionTentativa;
+        fTesis.value               = v.tesisCentral;
+        fConexion.value            = v.conexionFuturo;
+        fIdeaTexto.value           = v.ideaTexto;
+        fNotas.value               = v.roadmapNotas;
+      } else {
+        modalTitle.textContent = "Añadir al roadmap";
+        rmForm.reset();
+        fPrioridad.value  = "Media";
+        fEstadoRM.value   = "pendiente";
+        fOrden.value      = allRM.length + 1;
+        populateSagaSelect(fSaga, fArco);
+      }
+
+      modalOverlay.classList.remove("hidden");
+      fTitulo.focus();
+    }
+
+    function closeModal() {
+      modalOverlay.classList.add("hidden");
+      editingId = null;
+    }
+
+    document.getElementById("btnNuevoRoadmap").addEventListener("click", () => openModal());
+    document.getElementById("btnCloseModal").addEventListener("click", closeModal);
+    document.getElementById("btnCancel").addEventListener("click", closeModal);
+    modalOverlay.addEventListener("click", e => { if (e.target === modalOverlay) closeModal(); });
+
+    // ── Guardar ───────────────────────────────────────────
+    rmForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      const saveBtn = document.getElementById("btnSave");
+      saveBtn.disabled    = true;
+      saveBtn.textContent = "Guardando…";
+
+      const data = {
+        titulo:                    fTitulo.value.trim(),
+        tipoVideo:                 fTipo.value,
+        saga:                      fSaga.value,
+        arco:                      fArco.value,
+        prioridad:                 fPrioridad.value,
+        roadmapOrden:              Number(fOrden.value) || 0,
+        roadmapEstado:             fEstadoRM.value,
+        fechaGrabacionTentativa:   fFechaGrab.value,
+        fechaPublicacionTentativa: fFechaPub.value,
+        tesisCentral:              fTesis.value.trim(),
+        conexionFuturo:            fConexion.value.trim(),
+        ideaTexto:                 fIdeaTexto.value.trim(),
+        roadmapNotas:              fNotas.value.trim(),
+        estadoPipeline:            "roadmap"
+      };
+
+      try {
+        if (editingId) {
+          await updateVideo(editingId, data);
+          toast('<span class="ok">Entrada actualizada.</span>', "ok");
+        } else {
+          await createVideo(data);
+          toast('<span class="ok">Añadido al roadmap.</span>', "ok");
+        }
+        closeModal();
+        await load();
+      } catch (err) {
+        console.error(err);
+        toast("No se pudo guardar. Revisa Firestore.", "danger");
+      } finally {
+        saveBtn.disabled    = false;
+        saveBtn.textContent = "Guardar";
+      }
+    });
+
+    // ── Arranque ──────────────────────────────────────────
+    load();
+  </script>
+</body>
+</html>

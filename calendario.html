@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario · OnePiece</title>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/pages/calendario.css">
+</head>
+<body>
+  <div class="shell">
+    <div class="page-header">
+      <div class="page-header-text">
+        <div class="page-eyebrow">Pipeline editorial</div>
+        <h1 class="page-title">Calendario</h1>
+        <p>Vista mensual real con grabaciones, publicaciones y su histórico dentro del mismo documento de vídeo.</p>
+      </div>
+    </div>
+
+    <div class="calendar-toolbar">
+      <div class="calendar-toolbar-group">
+        <button class="btn-secondary btn-sm" id="btnPrevMonth" type="button">Anterior</button>
+        <button class="btn-secondary btn-sm" id="btnTodayMonth" type="button">Hoy</button>
+        <button class="btn-secondary btn-sm" id="btnNextMonth" type="button">Siguiente</button>
+      </div>
+      <div class="calendar-toolbar-spacer"></div>
+      <div class="calendar-month-label" id="monthLabel">—</div>
+    </div>
+
+    <div class="calendar-legend">
+      <span class="calendar-legend-item"><span class="calendar-legend-dot grabacion"></span>Grabación</span>
+      <span class="calendar-legend-item"><span class="calendar-legend-dot publicacion"></span>Publicación</span>
+      <span class="calendar-legend-item"><span class="calendar-legend-dot tentative"></span>Fecha tentativa</span>
+    </div>
+
+    <div class="calendar-stats" id="calendarStats">
+      <div class="loading card" style="padding:18px;"><div class="spinner"></div> Cargando métricas…</div>
+    </div>
+
+    <section class="calendar-layout">
+      <div class="card calendar-panel">
+        <div class="calendar-panel-header">
+          <h2 class="calendar-panel-title">Mes editorial</h2>
+          <span class="badge muted">Semana en lunes</span>
+        </div>
+        <div id="calendarGrid">
+          <div class="loading"><div class="spinner"></div> Cargando calendario…</div>
+        </div>
+      </div>
+
+      <aside class="card calendar-side" id="dayPanel">
+        <div class="loading"><div class="spinner"></div> Cargando detalle del día…</div>
+      </aside>
+    </section>
+
+    <div id="agendaRoot" style="margin-top:18px;">
+      <div class="loading"><div class="spinner"></div> Cargando agenda mensual…</div>
+    </div>
+  </div>
+
+  <script type="module" src="./assets/js/pages/calendario-page.js"></script>
+</body>
+</html>

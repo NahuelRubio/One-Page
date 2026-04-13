@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · OnePiece</title>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/pages/dashboard.css">
+</head>
+<body>
+  <!-- nav inyectado por renderNav() -->
+
+  <div class="shell">
+
+    <!-- ══════════════════════════════════════════════════
+         1. CABECERA DE PÁGINA
+    ══════════════════════════════════════════════════ -->
+    <header class="db-header">
+      <div class="db-header-body">
+
+        <!-- Texto principal -->
+        <div class="db-header-text">
+          <div class="db-eyebrow">Panel editorial · OnePiece</div>
+          <h1 class="db-title">Centro editorial</h1>
+          <p class="db-subtitle">Estado real del pipeline, próximos hitos y acción inmediata en un vistazo.</p>
+        </div>
+
+        <!-- Estado + acciones rápidas -->
+        <div class="db-header-side">
+          <div class="db-header-top-row">
+            <span class="badge" id="connectionBadge">Conectando…</span>
+            <div class="db-header-actions">
+              <a class="btn-primary btn-sm" href="ideas.html">Nueva idea</a>
+              <a class="btn-secondary btn-sm" id="nextScriptAction" href="guiones.html">Siguiente guion</a>
+              <a class="btn-secondary btn-sm" href="calendario.html">Ver calendario</a>
+            </div>
+          </div>
+
+          <!-- Chips de estado compactos -->
+          <div class="db-status-row">
+            <div class="db-status-chip">
+              <span class="db-status-val" id="heroMetricFocus">—</span>
+              <span class="db-status-lbl">Foco actual</span>
+            </div>
+            <div class="db-status-chip">
+              <span class="db-status-val" id="heroMetricUrgent">—</span>
+              <span class="db-status-lbl">Fechas próximas</span>
+            </div>
+            <div class="db-status-chip">
+              <span class="db-status-val" id="heroMetricBlocked">—</span>
+              <span class="db-status-lbl">Alertas</span>
+            </div>
+            <div class="db-status-chip">
+              <span class="db-status-val" id="heroMetricPublished">—</span>
+              <span class="db-status-lbl">Publicados recientes</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════
+         2. QUÉ TOCA AHORA — bloque editorial dominante
+    ══════════════════════════════════════════════════ -->
+    <section class="db-section">
+      <div class="db-section-hd">
+        <h2 class="db-section-title">Qué toca ahora</h2>
+      </div>
+      <div id="focusRoot">
+        <div class="card loading">
+          <div class="spinner"></div>
+          Calculando foco editorial…
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         3. DOS COLUMNAS: espacio editorial + contexto ops
+    ══════════════════════════════════════════════════ -->
+    <div class="db-main-cols">
+
+      <!-- IZQUIERDA: espacio editorial -->
+      <div class="db-col-editorial">
+
+        <!-- Ideas recientes -->
+        <section class="card db-panel">
+          <div class="db-panel-hd">
+            <h2 class="db-panel-title">Ideas recientes</h2>
+            <a href="ideas.html" class="db-panel-link">Ver todas las ideas →</a>
+          </div>
+          <div id="ideasPreview">
+            <div class="loading"><div class="spinner"></div> Cargando ideas…</div>
+          </div>
+        </section>
+
+        <!-- Roadmap prioritario -->
+        <section class="card db-panel">
+          <div class="db-panel-hd">
+            <h2 class="db-panel-title">Roadmap prioritario</h2>
+            <a href="roadmap.html" class="db-panel-link">Ver roadmap →</a>
+          </div>
+          <div id="roadmapPreview">
+            <div class="loading"><div class="spinner"></div> Cargando roadmap…</div>
+          </div>
+        </section>
+
+        <!-- Guiones activos -->
+        <section class="card db-panel">
+          <div class="db-panel-hd">
+            <h2 class="db-panel-title">Guiones activos</h2>
+            <a href="guiones.html" class="db-panel-link">Ver todos los guiones →</a>
+          </div>
+          <div id="scriptsPreview">
+            <div class="loading"><div class="spinner"></div> Cargando guiones…</div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- DERECHA: contexto operativo -->
+      <div class="db-col-ops">
+
+        <!-- Bloqueos y alertas -->
+        <section class="card db-panel">
+          <div class="db-panel-hd">
+            <h2 class="db-panel-title">Bloqueos y alertas</h2>
+          </div>
+          <div id="alertsRoot">
+            <div class="loading"><div class="spinner"></div> Detectando alertas…</div>
+          </div>
+        </section>
+
+        <!-- Próximas fechas -->
+        <section class="card db-panel">
+          <div class="db-panel-hd">
+            <h2 class="db-panel-title">Próximas fechas</h2>
+            <a href="calendario.html" class="db-panel-link">Ver agenda →</a>
+          </div>
+          <div id="datesPreview">
+            <div class="loading"><div class="spinner"></div> Cargando agenda…</div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         4. ACTIVIDAD RECIENTE
+    ══════════════════════════════════════════════════ -->
+    <section class="db-section">
+      <div class="db-section-hd">
+        <h2 class="db-section-title">Actividad reciente</h2>
+      </div>
+      <div id="activityRoot">
+        <div class="card loading">
+          <div class="spinner"></div>
+          Leyendo actividad…
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         5. ÚLTIMOS PUBLICADOS
+    ══════════════════════════════════════════════════ -->
+    <section class="db-section">
+      <div class="db-section-hd">
+        <h2 class="db-section-title">Últimos publicados</h2>
+        <a href="publicados.html" class="db-section-link">Ver histórico completo →</a>
+      </div>
+      <div id="publishedRoot">
+        <div class="card loading">
+          <div class="spinner"></div>
+          Cargando publicados…
+        </div>
+      </div>
+    </section>
+
+    <!-- Contenedor oculto para resumen de métricas (usado por JS, no visible) -->
+    <div id="summaryRoot" class="db-hidden-el" aria-hidden="true"></div>
+
+  </div>
+
+  <script type="module" src="./assets/js/pages/dashboard-page.js"></script>
+</body>
+</html>

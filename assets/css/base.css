@@ -1,0 +1,112 @@
+/* ============================================================
+   BASE — variables, reset, body, tipografía, toast
+   ============================================================ */
+
+:root {
+  /* ── Surfaces ──────────────────────────────────── */
+  --bg:        #edf0f7;
+  --bg-soft:   #e2e6f0;
+  --surface:   #ffffff;
+  --surface-2: #f5f7fc;
+  --panel:     #ffffff;
+  --panel-2:   rgba(0,15,50,.04);
+
+  /* ── Lines ─────────────────────────────────────── */
+  --line:        rgba(0,15,50,.09);
+  --line-strong: rgba(0,15,50,.16);
+
+  /* ── Text ───────────────────────────────────────── */
+  --text:    #16213a;
+  --muted:   #63718f;
+  --muted-2: #8a98b5;
+
+  /* ── Accents ────────────────────────────────────── */
+  --accent:   #3b6af5;
+  --accent-2: #7058e8;
+  --green:    #1a9a6a;
+  --yellow:   #c47a0e;
+  --pink:     #9c4dcc;
+  --red:      #d63535;
+
+  /* ── Shadows ────────────────────────────────────── */
+  --shadow:    0 1px 3px rgba(0,15,50,.05), 0 4px 16px rgba(0,15,50,.07);
+  --shadow-md: 0 2px 8px rgba(0,15,50,.07), 0 12px 36px rgba(0,15,50,.09);
+  --shadow-lg: 0 4px 16px rgba(0,15,50,.08), 0 24px 64px rgba(0,15,50,.12);
+
+  /* ── Layout ─────────────────────────────────────── */
+  --radius: 16px;
+  --nav-h:  62px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+               'Segoe UI', Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(ellipse at top left,  rgba(59,106,245,.07), transparent 40%),
+    radial-gradient(ellipse at top right, rgba(112,88,232,.05), transparent 36%),
+    #edf0f7;
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
+  color: var(--text);
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+:focus-visible {
+  outline: 2px solid rgba(59,106,245,.7);
+  outline-offset: 2px;
+}
+
+.hidden { display: none !important; }
+
+.ok     { color: var(--green);  }
+.warn   { color: var(--yellow); }
+.danger { color: var(--red);    }
+
+/* ── Toast ─────────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 13px 18px;
+  border-radius: 14px;
+  background: rgba(22,33,58,.96);
+  border: 1px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(16px);
+  color: #eef2ff;
+  font-size: .9rem;
+  box-shadow: var(--shadow-md);
+  animation: toast-in .22s ease;
+  pointer-events: auto;
+  max-width: 320px;
+}
+.toast.ok     { border-color: rgba(26,154,106,.5); }
+.toast.danger { border-color: rgba(214,53,53,.5);  }
+.toast.warn   { border-color: rgba(196,122,14,.5); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
