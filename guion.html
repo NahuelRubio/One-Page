@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="./assets/css/base.css">
   <link rel="stylesheet" href="./assets/css/components.css">
   <link rel="stylesheet" href="./assets/css/layout.css">
+
+  <!-- Toast UI Editor -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+
   <style>
     /* ── Header del guion ─────────────────────────────────── */
     .guion-header {
@@ -61,31 +65,21 @@
       padding-left: 4px;
     }
 
-    /* ── Toolbar editor/preview ───────────────────────────── */
+    /* ── Editor toolbar ───────────────────────────────────── */
     .editor-toolbar {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
     }
-    .tab-group { display: flex; background: rgba(255,255,255,.05); border-radius: 12px; border: 1px solid var(--line); overflow: hidden; }
-    .tab-btn {
-      padding: 9px 18px;
-      font-size: .88rem;
-      font-weight: 600;
-      color: var(--muted);
-      background: transparent;
-      border: none;
-      border-radius: 0;
-      cursor: pointer;
-      transition: color .15s, background .15s;
-    }
-    .tab-btn:hover { color: var(--text); transform: none; }
-    .tab-btn.active { color: var(--text); background: rgba(110,168,255,.18); }
-    .tab-divider { width: 1px; background: var(--line); }
-
     .editor-toolbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    .version-label {
+      font-size: .78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
 
     .btn-plantilla {
       padding: 9px 14px;
@@ -103,112 +97,141 @@
     }
     .btn-plantilla:hover { background: rgba(255,209,102,.16); transform: none; }
 
-    .version-label {
-      font-size: .78rem;
-      color: var(--muted);
-      white-space: nowrap;
+    /* ── Toast UI dark overrides ──────────────────────────── */
+
+    /* Contenedor principal */
+    .toastui-editor-defaultUI,
+    .toastui-editor-defaultUI * { box-sizing: border-box; }
+
+    .toastui-editor-defaultUI {
+      border: 1px solid var(--line) !important;
+      border-radius: 16px !important;
+      overflow: hidden;
     }
 
-    /* ── Editor ───────────────────────────────────────────── */
-    .guion-editor {
-      width: 100%;
-      min-height: 65vh;
-      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
-      font-size: .92rem;
-      line-height: 1.8;
-      resize: vertical;
-      background: rgba(8,13,25,.7);
-      color: var(--text);
-      padding: 24px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      tab-size: 2;
-    }
-    .guion-editor:focus {
-      border-color: rgba(110,168,255,.5);
-      box-shadow: 0 0 0 3px rgba(110,168,255,.1);
+    /* Toolbar */
+    .toastui-editor-defaultUI .toastui-editor-toolbar {
+      background: #0e1428 !important;
+      border-bottom: 1px solid rgba(255,255,255,.08) !important;
     }
 
-    /* ── Preview ──────────────────────────────────────────── */
-    .guion-preview {
-      min-height: 65vh;
-      padding: 28px 32px;
-      background: rgba(8,13,25,.5);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      font-size: .95rem;
-      line-height: 1.8;
-      color: var(--text);
-      max-width: 780px;
-      margin: 0 auto;
+    .toastui-editor-defaultUI .toastui-editor-toolbar .toastui-editor-toolbar-icons {
+      background-color: transparent !important;
+      border-color: transparent !important;
+      filter: invert(1) brightness(0.65) !important;
     }
-    .guion-preview h1 {
-      font-size: 1.5rem;
-      margin: 1.6em 0 .5em;
-      padding-bottom: .4em;
-      border-bottom: 1px solid var(--line);
-      letter-spacing: -.02em;
+    .toastui-editor-defaultUI .toastui-editor-toolbar .toastui-editor-toolbar-icons:hover {
+      background-color: rgba(255,255,255,.1) !important;
+      filter: invert(1) brightness(0.9) !important;
     }
-    .guion-preview h1:first-child { margin-top: 0; }
-    .guion-preview h2 {
-      font-size: 1.1rem;
-      margin: 1.4em 0 .4em;
-      color: var(--accent);
-      letter-spacing: -.01em;
+    .toastui-editor-defaultUI .toastui-editor-toolbar .toastui-editor-toolbar-icons.active {
+      background-color: rgba(110,168,255,.2) !important;
+      filter: invert(1) brightness(1) !important;
     }
-    .guion-preview h3 {
-      font-size: .98rem;
-      margin: 1.2em 0 .3em;
-      color: var(--accent-2);
-    }
-    .guion-preview p  { margin: 0 0 1em; }
-    .guion-preview p:last-child { margin-bottom: 0; }
-    .guion-preview strong { color: var(--text); font-weight: 700; }
-    .guion-preview em { color: #c8d0f0; font-style: italic; }
-    .guion-preview ul, .guion-preview ol { margin: 0 0 1em; padding-left: 1.6em; }
-    .guion-preview li { margin-bottom: .35em; }
-    .guion-preview blockquote {
-      border-left: 3px solid var(--accent);
-      margin: 1.2em 0;
-      padding: .6em 1.2em;
-      color: var(--muted);
-      background: rgba(110,168,255,.05);
-      border-radius: 0 10px 10px 0;
-    }
-    .guion-preview hr {
-      border: none;
-      border-top: 1px solid var(--line);
-      margin: 2em 0;
-    }
-    .guion-preview code {
-      background: rgba(255,255,255,.08);
-      padding: 2px 6px;
-      border-radius: 5px;
-      font-family: monospace;
-      font-size: .88em;
-    }
-    .guion-preview pre {
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 16px;
-      overflow-x: auto;
-      margin-bottom: 1em;
-    }
-    .guion-preview pre code { background: none; padding: 0; font-size: .88rem; }
 
-    .preview-empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 40vh;
-      color: var(--muted);
-      gap: 12px;
-      font-size: .9rem;
+    /* Separador entre grupos */
+    .toastui-editor-toolbar-divider {
+      background: rgba(255,255,255,.1) !important;
     }
+
+    /* Área de escritura */
+    .toastui-editor-defaultUI .toastui-editor-ww-container,
+    .toastui-editor-defaultUI .toastui-editor-md-container {
+      background: #080d19 !important;
+    }
+
+    .toastui-editor-defaultUI .ProseMirror {
+      color: #e0e6f5 !important;
+      font-size: .95rem !important;
+      line-height: 1.8 !important;
+      padding: 28px 32px !important;
+      min-height: 60vh;
+      caret-color: #6ea8ff !important;
+    }
+    .toastui-editor-defaultUI .ProseMirror:focus { outline: none !important; }
+
+    /* Placeholder */
+    .toastui-editor-defaultUI .ProseMirror .placeholder { color: rgba(255,255,255,.2) !important; }
+
+    /* Tipografía */
+    .toastui-editor-contents h1,
+    .toastui-editor-contents h2,
+    .toastui-editor-contents h3,
+    .toastui-editor-contents h4 { color: #e0e6f5 !important; font-family: inherit !important; }
+
+    .toastui-editor-contents h1 {
+      font-size: 1.55rem !important;
+      margin: 1.4em 0 .5em !important;
+      padding-bottom: .4em !important;
+      border-bottom: 1px solid rgba(255,255,255,.08) !important;
+    }
+    .toastui-editor-contents h1:first-child { margin-top: 0 !important; }
+    .toastui-editor-contents h2 {
+      font-size: 1.15rem !important;
+      color: #6ea8ff !important;
+    }
+    .toastui-editor-contents h3 {
+      font-size: 1rem !important;
+      color: #9b7bff !important;
+    }
+    .toastui-editor-contents p { color: #c8d0f0 !important; margin: 0 0 .8em !important; }
+    .toastui-editor-contents strong { color: #e0e6f5 !important; font-weight: 700 !important; }
+    .toastui-editor-contents em { color: #c8d0f0 !important; font-style: italic !important; }
+    .toastui-editor-contents del { color: rgba(200,208,240,.5) !important; }
+
+    .toastui-editor-contents ul,
+    .toastui-editor-contents ol { color: #c8d0f0 !important; }
+    .toastui-editor-contents li { color: #c8d0f0 !important; }
+
+    .toastui-editor-contents blockquote {
+      border-left: 3px solid #6ea8ff !important;
+      background: rgba(110,168,255,.06) !important;
+      border-radius: 0 10px 10px 0 !important;
+      padding: .5em 1.2em !important;
+      margin: 1em 0 !important;
+    }
+    .toastui-editor-contents blockquote p { color: rgba(200,208,240,.7) !important; margin: 0 !important; }
+
+    .toastui-editor-contents code {
+      background: rgba(255,255,255,.1) !important;
+      color: #9b7bff !important;
+      border-radius: 5px !important;
+      padding: 2px 6px !important;
+      font-size: .88em !important;
+    }
+    .toastui-editor-contents pre {
+      background: rgba(255,255,255,.05) !important;
+      border: 1px solid rgba(255,255,255,.08) !important;
+      border-radius: 12px !important;
+      padding: 16px !important;
+    }
+    .toastui-editor-contents pre code { background: none !important; color: #c8d0f0 !important; }
+
+    .toastui-editor-contents hr {
+      border: none !important;
+      border-top: 1px solid rgba(255,255,255,.1) !important;
+      margin: 1.8em 0 !important;
+    }
+
+    /* Popups y dropdowns */
+    .toastui-editor-popup-body,
+    .toastui-editor-dropdown-toolbar,
+    .toastui-editor-context-menu {
+      background: #141c35 !important;
+      border: 1px solid rgba(255,255,255,.1) !important;
+      border-radius: 12px !important;
+    }
+    .toastui-editor-popup-add-heading button,
+    .toastui-editor-dropdown-toolbar button {
+      color: #c8d0f0 !important;
+    }
+    .toastui-editor-popup-add-heading button:hover,
+    .toastui-editor-dropdown-toolbar button:hover {
+      background: rgba(255,255,255,.07) !important;
+    }
+
+    /* Ocultar barra inferior de modo wysiwyg/markdown */
+    .toastui-editor-mode-switch { display: none !important; }
 
     /* ── Prompt section ───────────────────────────────────── */
     .prompt-section { margin-top: 28px; }
@@ -248,9 +271,6 @@
       font-size: .84rem;
       width: auto;
     }
-    .guion-sin_empezar { color: var(--muted);  }
-    .guion-en_progreso { color: var(--yellow); }
-    .guion-listo       { color: var(--green);  }
 
     .btn-calendario {
       padding: 9px 14px;
@@ -269,9 +289,8 @@
     .btn-calendario:hover { background: rgba(89,214,165,.16); transform: none; }
 
     @media (max-width: 700px) {
-      .guion-preview { padding: 18px; }
-      .guion-editor  { padding: 16px; }
-      .guion-header  { flex-direction: column; }
+      .toastui-editor-contents { padding: 18px 16px !important; }
+      .guion-header { flex-direction: column; }
     }
   </style>
 </head>
@@ -280,6 +299,9 @@
   <div class="shell" id="mainShell">
     <div class="loading"><div class="spinner"></div> Cargando guion…</div>
   </div>
+
+  <!-- Toast UI Editor (UMD, antes del módulo) -->
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
   <script type="module">
     import { renderNav } from "./assets/js/utils/nav.js";
@@ -290,16 +312,11 @@
       getVideo, updateVideo, saveGuionMarkdown, moveToStage
     } from "./assets/js/services/videos.js";
 
-    // marked.js via CDN para renderizar markdown
-    import { marked } from "https://cdn.jsdelivr.net/npm/marked@9/lib/marked.esm.js";
-    marked.use({ breaks: true, gfm: true });
-
     renderNav();
 
-    // ── Estado de la página ───────────────────────────────
     const videoId = getParam("id");
     let video     = null;
-    let mode      = "editor"; // "editor" | "preview"
+    let editor    = null; // instancia Toast UI
     let isDirty   = false;
 
     const shell = document.getElementById("mainShell");
@@ -326,10 +343,6 @@
           return;
         }
 
-        // Comportamiento clave del spec:
-        // sin markdown → modo editor; con markdown → modo preview
-        mode = (!video.guionMarkdown || !video.guionMarkdown.trim()) ? "editor" : "preview";
-
         document.title = `${video.titulo || "Guion"} · OnePiece`;
         render();
       } catch (err) {
@@ -339,12 +352,10 @@
       }
     }
 
-    // ── Render completo de la página ──────────────────────
+    // ── Render ────────────────────────────────────────────
     function render() {
-      const tipoLabel   = TIPO_LABELS[video.tipoVideo] ?? "";
-      const estadoLabel = GUION_LABELS[video.guionEstado] ?? video.guionEstado;
-      const fecha       = formatTimestamp(video.guionUltimaEdicion || video.updatedAt);
-      const hasMarkdown = video.guionMarkdown && video.guionMarkdown.trim();
+      const tipoLabel = TIPO_LABELS[video.tipoVideo] ?? "";
+      const fecha     = formatTimestamp(video.guionUltimaEdicion || video.updatedAt);
 
       shell.innerHTML = `
 
@@ -390,15 +401,10 @@
           <p class="conexion-bar">Conexión: ${escapeHtml(video.conexionFuturo)}</p>
         ` : ""}
 
-        <!-- ── Toolbar editor/preview ──────────────────────── -->
+        <!-- ── Toolbar ────────────────────────────────────── -->
         <div class="editor-toolbar">
-          <div class="tab-group">
-            <button class="tab-btn${mode === "editor"  ? " active" : ""}" id="tabEditor"  type="button">Editar</button>
-            <div class="tab-divider"></div>
-            <button class="tab-btn${mode === "preview" ? " active" : ""}" id="tabPreview" type="button">Preview</button>
-          </div>
+          ${fecha !== "—" ? `<span class="version-label">v${video.guionVersion || 1} · ${fecha}</span>` : ""}
           <div class="editor-toolbar-right">
-            ${fecha !== "—" ? `<span class="version-label">v${video.guionVersion} · ${fecha}</span>` : ""}
             <button class="btn-plantilla js-btn-plantilla" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
@@ -416,10 +422,8 @@
           </div>
         </div>
 
-        <!-- ── Área de contenido ───────────────────────────── -->
-        <div id="contentArea">
-          ${renderContentArea()}
-        </div>
+        <!-- ── Editor WYSIWYG ─────────────────────────────── -->
+        <div id="editorMount"></div>
 
         <!-- ── Prompt base ─────────────────────────────────── -->
         <div class="prompt-section">
@@ -432,50 +436,53 @@
         </div>
       `;
 
-      // Bind tras render
+      initEditor();
       bindActions();
     }
 
-    function renderContentArea() {
-      if (mode === "editor") {
-        return `<textarea class="guion-editor" id="guionEditor" placeholder="Escribe tu guion en markdown…\n\nPulsa 'Generar plantilla' para empezar con una estructura base.">${escapeHtml(video.guionMarkdown || "")}</textarea>`;
-      }
+    // ── Inicializar Toast UI Editor ───────────────────────
+    function initEditor() {
+      const { Editor } = toastui;
 
-      if (!video.guionMarkdown || !video.guionMarkdown.trim()) {
-        return `<div class="guion-preview"><div class="preview-empty">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span>El guion está vacío.</span>
-          <button class="btn-primary btn-sm" onclick="document.getElementById('tabEditor').click()">Empezar a escribir</button>
-        </div></div>`;
-      }
-
-      return `<div class="guion-preview" id="guionPreview">${marked.parse(video.guionMarkdown)}</div>`;
+      editor = new Editor({
+        el: document.getElementById("editorMount"),
+        initialEditType: "wysiwyg",
+        previewStyle: "tab",
+        height: "auto",
+        minHeight: "60vh",
+        initialValue: video.guionMarkdown || "",
+        placeholder: "Empieza a escribir tu guion…\n\nUsa # para títulos, **negrita**, *cursiva*, > para citas…",
+        hideModeSwitch: true,
+        toolbarItems: [
+          ["heading", "bold", "italic", "strike"],
+          ["hr", "quote"],
+          ["ul", "ol"],
+          ["indent", "outdent"],
+          ["scrollSync"],
+        ],
+        events: {
+          change: () => { isDirty = true; },
+        },
+      });
     }
 
     // ── Bind acciones ─────────────────────────────────────
     function bindActions() {
-      // Tabs
-      document.getElementById("tabEditor")?.addEventListener("click", () => {
-        if (mode === "editor") return;
-        // Si estábamos en preview, sincronizar el markdown al volver a editor
-        mode = "editor";
-        switchTab();
-      });
-
-      document.getElementById("tabPreview")?.addEventListener("click", () => {
-        if (mode === "preview") return;
-        // Guardar el contenido actual del textarea antes de cambiar
-        const editor = document.getElementById("guionEditor");
-        if (editor) video.guionMarkdown = editor.value;
-        mode = "preview";
-        switchTab();
-      });
-
       // Guardar
       document.querySelector(".js-btn-save")?.addEventListener("click", saveGuion);
 
       // Generar plantilla
-      document.querySelector(".js-btn-plantilla")?.addEventListener("click", insertTemplate);
+      document.querySelector(".js-btn-plantilla")?.addEventListener("click", () => {
+        const template = getTemplate(video);
+        const current  = editor.getMarkdown().trim();
+        if (!current) {
+          editor.setMarkdown(template);
+        } else {
+          editor.setMarkdown(current + "\n\n---\n\n" + template);
+        }
+        isDirty = true;
+        toast("Plantilla insertada.", "ok");
+      });
 
       // Estado select
       document.querySelector(".js-estado-select")?.addEventListener("change", async e => {
@@ -494,10 +501,9 @@
         const btn = document.querySelector(".js-btn-calendario");
         btn.disabled = true;
         try {
-          // Guardar el markdown actual antes de mover
-          const editor = document.getElementById("guionEditor");
-          if (editor && editor.value !== video.guionMarkdown) {
-            await saveGuionMarkdown(videoId, editor.value, video);
+          const markdown = editor.getMarkdown();
+          if (markdown !== video.guionMarkdown) {
+            await saveGuionMarkdown(videoId, markdown, video);
           }
           await moveToStage(videoId, "calendario");
           toast('<span class="ok">Movido a Calendario.</span>', "ok");
@@ -528,33 +534,12 @@
           toast("No se pudo copiar. Copia el texto manualmente.", "warn");
         }
       });
-
-      // Track cambios en el editor
-      document.getElementById("guionEditor")?.addEventListener("input", () => { isDirty = true; });
     }
 
-    // ── Cambiar tab ───────────────────────────────────────
-    function switchTab() {
-      const tabE = document.getElementById("tabEditor");
-      const tabP = document.getElementById("tabPreview");
-      tabE?.classList.toggle("active", mode === "editor");
-      tabP?.classList.toggle("active", mode === "preview");
-      const contentArea = document.getElementById("contentArea");
-      if (contentArea) contentArea.innerHTML = renderContentArea();
-
-      // Re-bind el botón de "Empezar a escribir" del preview vacío
-      document.getElementById("guionEditor")?.addEventListener("input", () => { isDirty = true; });
-    }
-
-    // ── Guardar guion ─────────────────────────────────────
+    // ── Guardar ───────────────────────────────────────────
     async function saveGuion() {
-      const editor = document.getElementById("guionEditor");
-      const saveBtn = document.querySelector(".js-btn-save");
-
-      // Si estamos en preview, guardar el markdown actual del video
-      const markdown = mode === "editor"
-        ? (editor ? editor.value : video.guionMarkdown)
-        : video.guionMarkdown;
+      const saveBtn  = document.querySelector(".js-btn-save");
+      const markdown = editor.getMarkdown();
 
       saveBtn.disabled    = true;
       saveBtn.textContent = "Guardando…";
@@ -565,7 +550,6 @@
         video.guionVersion  = (video.guionVersion || 1) + 1;
         isDirty = false;
         toast('<span class="ok">Guion guardado.</span>', "ok");
-        // Actualizar versión en toolbar sin re-render completo
         const vl = document.querySelector(".version-label");
         if (vl) vl.textContent = `v${video.guionVersion} · Ahora mismo`;
       } catch (err) {
@@ -573,49 +557,15 @@
         toast("Error al guardar. Revisa Firestore.", "danger");
       } finally {
         saveBtn.disabled    = false;
-        saveBtn.textContent = "Guardar";
+        saveBtn.innerHTML   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar`;
       }
     }
 
-    // ── Insertar / añadir plantilla ───────────────────────
-    function insertTemplate() {
-      // Si no estamos en modo editor, cambiar antes
-      if (mode !== "editor") {
-        mode = "editor";
-        switchTab();
-      }
-
-      const editor = document.getElementById("guionEditor");
-      if (!editor) return;
-
-      const template = getTemplate(video);
-      const current  = editor.value.trim();
-
-      if (!current) {
-        // Sin contenido → insertar directamente
-        editor.value = template;
-        toast("Plantilla insertada en el editor.", "ok");
-      } else {
-        // Con contenido → añadir al final con separador
-        editor.value = current + "\n\n---\n\n" + template;
-        toast("Plantilla añadida al final del guion.", "ok");
-        // Scroll al final
-        editor.scrollTop = editor.scrollHeight;
-      }
-
-      isDirty = true;
-    }
-
-    // ── Advertir al salir con cambios sin guardar ─────────
+    // ── Advertir al salir con cambios ─────────────────────
     window.addEventListener("beforeunload", e => {
-      const editor = document.getElementById("guionEditor");
-      if (isDirty || (editor && editor.value !== video?.guionMarkdown)) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
+      if (isDirty) { e.preventDefault(); e.returnValue = ""; }
     });
 
-    // ── Arranque ──────────────────────────────────────────
     load();
   </script>
 </body>
