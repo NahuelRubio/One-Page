@@ -307,7 +307,7 @@
     import { TIPO_LABELS, populateSagaSelect } from "./assets/js/config/sagas.js";
     import {
       getAllVideos, createVideo, updateVideo, deleteVideo,
-      moveToStage, filterByStage, lastReadMeta
+      moveToStage, filterByStage
     } from "./assets/js/services/videos.js";
 
     renderNav();
@@ -346,35 +346,6 @@
       return `${code}${message}`.trim();
     }
 
-    // ── Debug panel ───────────────────────────────────────
-    function renderDebugPanel() {
-      const existing = document.getElementById("firebaseDebugPanel");
-      if (existing) existing.remove();
-
-      const m = lastReadMeta;
-      const sourceColor = m.source === "server" ? "#4ade80" : m.source === "cache" ? "#facc15" : "#f87171";
-      const sourceLabel = m.source ?? "—";
-      const errCode    = m.error?.code    ?? "";
-      const errMsg     = m.error?.message ?? "";
-
-      const panel = document.createElement("details");
-      panel.id = "firebaseDebugPanel";
-      panel.style.cssText = "margin:0 0 18px;padding:10px 14px;border:1px solid #444;border-radius:8px;font-size:.8rem;font-family:monospace;background:#111;line-height:1.8;";
-      panel.innerHTML = `
-        <summary style="cursor:pointer;font-weight:700;letter-spacing:.04em;">🔥 Firebase debug</summary>
-        <div style="margin-top:8px;">
-          <div><span style="color:#888;">origin:</span> <strong>${escapeHtml(location.origin)}</strong></div>
-          <div><span style="color:#888;">projectId:</span> <strong>OnePiececanal-f8dd1</strong></div>
-          <div><span style="color:#888;">SDK source:</span> <strong style="color:${sourceColor}">${escapeHtml(sourceLabel)}</strong></div>
-          ${errCode ? `<div><span style="color:#888;">error.code:</span> <strong style="color:#f87171">${escapeHtml(errCode)}</strong></div>` : ""}
-          ${errMsg  ? `<div><span style="color:#888;">error.message:</span> <span style="color:#f87171;word-break:break-all;">${escapeHtml(errMsg)}</span></div>` : ""}
-        </div>`;
-
-      // Insertar antes del contenido principal
-      const container = root.closest(".container") ?? root.parentElement;
-      container.insertBefore(panel, root);
-    }
-
     async function load() {
       try {
         const all = await getAllVideos();
@@ -388,8 +359,6 @@
           Revisa la conexión o las reglas de Firestore.${detail ? `<br><small>${escapeHtml(detail)}</small>` : ""}
         </div>`;
         toast(`Error al cargar ideas.${detail ? ` ${escapeHtml(detail)}` : ""}`, "danger");
-      } finally {
-        renderDebugPanel();
       }
     }
 

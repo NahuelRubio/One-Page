@@ -34,12 +34,6 @@ import {
 const COL = "videos";
 const videosRef = collection(db, COL);
 
-/**
- * Metadatos de la última lectura de getAllVideos().
- * Útil para mostrar info de depuración en UI.
- * @type {{ source: 'server'|'cache'|'error'|null, error: Error|null, ts: number|null }}
- */
-export const lastReadMeta = { source: null, error: null, ts: null };
 
 /**
  * Estructura completa de un documento de vídeo con valores por defecto.
@@ -203,14 +197,9 @@ export async function getVideo(id) {
  */
 export async function getAllVideos() {
   let snap;
-  lastReadMeta.ts = Date.now();
   try {
     snap = await getDocsFromServer(videosRef);
-    lastReadMeta.source = "server";
-    lastReadMeta.error  = null;
   } catch (serverError) {
-    lastReadMeta.source = "cache";
-    lastReadMeta.error  = serverError;
     console.warn("[videos] getAllVideos: no se pudo leer desde servidor, usando caché/local si existe.", serverError);
     try {
       snap = await getDocs(videosRef);
