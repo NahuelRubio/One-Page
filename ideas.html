@@ -303,6 +303,8 @@
   ══════════════════════════════════════════════════════ -->
   <script type="module">
     import { renderNav } from "./assets/js/utils/nav.js";
+    import { requireAuth } from "./assets/js/utils/auth.js";
+    requireAuth();
     import { escapeHtml, formatTimestamp, toast, truncate } from "./assets/js/utils/helpers.js";
     import { TIPO_LABELS, populateSagaSelect } from "./assets/js/config/sagas.js";
     import {

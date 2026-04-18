@@ -305,6 +305,8 @@
 
   <script type="module">
     import { renderNav } from "./assets/js/utils/nav.js";
+    import { requireAuth } from "./assets/js/utils/auth.js";
+    requireAuth();
     import { getParam, escapeHtml, formatTimestamp, toast } from "./assets/js/utils/helpers.js";
     import { TIPO_LABELS, GUION_LABELS } from "./assets/js/config/sagas.js";
     import { getTemplate, buildPrompt } from "./assets/js/config/plantillas.js";

@@ -1,4 +1,6 @@
 import { renderNav } from "../utils/nav.js";
+import { requireAuth } from "../utils/auth.js";
+requireAuth();
 import {
   debounce,
   escapeHtml,
